@@ -75,9 +75,10 @@
         unidades: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
         cursos: '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
         contato: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>',
+        relatorios: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
         seguranca: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'
     };
-    var VIEWS = [['painel', 'Painel'], ['mensagens', 'Mensagens'], ['blog', 'Blog'], ['unidades', 'Cidades'], ['cursos', 'Cursos'], ['contato', 'Contato e redes'], ['seguranca', 'Segurança']];
+    var VIEWS = [['painel', 'Painel'], ['mensagens', 'Mensagens'], ['relatorios', 'Relatórios'], ['blog', 'Blog'], ['unidades', 'Cidades'], ['cursos', 'Cursos'], ['contato', 'Contato e redes'], ['seguranca', 'Segurança']];
     var current = 'painel';
 
     function svg(name) { var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('class', 'ico'); s.setAttribute('fill', 'none'); s.setAttribute('stroke', 'currentColor'); s.setAttribute('stroke-width', '2'); s.setAttribute('stroke-linecap', 'round'); s.setAttribute('stroke-linejoin', 'round'); s.setAttribute('aria-hidden', 'true'); s.innerHTML = ICON[name]; return s; }
@@ -85,6 +86,8 @@
     function buildNav() {
         var nav = $('#nav'); nav.textContent = '';
         VIEWS.forEach(function (v) {
+            if (v[0] === 'blog') nav.appendChild(h('p', { class: 'nav__group', text: 'Conteúdo do site (opcional)' }));
+            if (v[0] === 'seguranca') nav.appendChild(h('p', { class: 'nav__group', text: 'Conta' }));
             var novos = v[0] === 'mensagens' ? leads.filter(function (l) { return l.status === 'novo'; }).length : 0;
             var b = h('button', { type: 'button', 'data-v': v[0], 'aria-current': v[0] === current ? 'page' : false, onclick: function () { go(v[0]); } }, svg(v[0]), v[1], novos ? h('span', { class: 'count', text: String(novos) }) : null);
             nav.appendChild(b);
@@ -139,6 +142,16 @@
         return { box: h('div', null, h('label', { for: id, text: 'Imagem' }), h('div', { class: 'upload' }, url, btn, file), h('p', { class: 'hint', text: 'JPG, PNG ou WEBP, até 5 MB.' }), prev), url: url };
     }
 
+    function csvFile(rows, name) {
+        var cols = ['ts', 'status', 'name', 'phone', 'email', 'age', 'city', 'course', 'subject', 'message', 'source', 'notes'];
+        var head = ['Data', 'Status', 'Nome', 'Telefone', 'E-mail', 'Idade', 'Cidade', 'Curso', 'Assunto', 'Mensagem', 'Origem', 'Anotações'];
+        function cell(v) { v = String(v == null ? '' : v); if (/^[=+\-@\t\r]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; }
+        var out = '\ufeff' + head.join(';') + '\r\n' + rows.map(function (l) { return cols.map(function (c) { return cell(c === 'ts' ? fdate(l.ts) : l[c]); }).join(';'); }).join('\r\n');
+        var url = URL.createObjectURL(new Blob([out], { type: 'text/csv;charset=utf-8' }));
+        var a = h('a', { href: url, download: name }); document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+    }
+
     /* ---------- views ---------- */
     var RENDER = {};
 
@@ -166,13 +179,14 @@
         var st = h('select', { 'aria-label': 'Filtrar por status' }, [['', 'Todos os status'], ['novo', 'Novos'], ['contatado', 'Contatados'], ['matriculado', 'Matriculados'], ['arquivado', 'Arquivados']].map(function (o) { return h('option', { value: o[0], text: o[1] }); }));
         var count = h('span', { class: 'hint' });
         var list = h('div', { class: 'leads' });
-        var shown = 40;
-        view.appendChild(h('div', { class: 'bar' }, q, st, count, h('span', { class: 'spacer' }), h('a', { class: 'btn btn--line btn--sm', href: '/api/admin/leads.csv', text: 'Exportar CSV' })));
+        var shown = 40, lastRows = [];
+        view.appendChild(h('div', { class: 'bar' }, q, st, count, h('span', { class: 'spacer' }), h('button', { type: 'button', class: 'btn btn--line btn--sm', text: 'Exportar CSV', onclick: function () { csvFile(lastRows, 'mensagens-itep.csv'); } })));
         view.appendChild(list);
 
         function draw() {
             var t = q.value.trim().toLowerCase(), s = st.value;
             var rows = leads.filter(function (l) { return (!s || l.status === s) && (!t || [l.name, l.phone, l.email, l.course, l.city, l.message, l.subject].join(' ').toLowerCase().indexOf(t) !== -1); });
+            lastRows = rows;
             count.textContent = rows.length + (rows.length === 1 ? ' mensagem' : ' mensagens');
             list.textContent = '';
             if (!rows.length) { list.appendChild(h('p', { class: 'empty', text: leads.length ? 'Nenhuma mensagem com esse filtro.' : 'Nenhuma mensagem recebida ainda. Elas chegam aqui pelos formulários do site.' })); return; }
@@ -205,6 +219,97 @@
             return card;
         }
         q.addEventListener('input', function () { shown = 40; draw(); }); st.addEventListener('change', function () { shown = 40; draw(); }); draw();
+    };
+
+    /* --- relatórios --- */
+    RENDER.relatorios = function (view) {
+        var DAY = 864e5;
+        function ymd(d) { var m = d.getMonth() + 1, dd = d.getDate(); return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (dd < 10 ? '0' : '') + dd; }
+        function startOf(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+        function pt(d) { return d.toLocaleDateString('pt-BR'); }
+        var now = new Date();
+        var period = h('select', { id: 'rp', 'aria-label': 'Período' }, [['7', 'Últimos 7 dias'], ['30', 'Últimos 30 dias'], ['90', 'Últimos 90 dias'], ['mes', 'Este mês'], ['tudo', 'Todo o período'], ['custom', 'Personalizado…']].map(function (o) { return h('option', { value: o[0], text: o[1], selected: o[0] === '30' }); }));
+        var from = h('input', { type: 'date', id: 'rf', 'aria-label': 'De' }); var to = h('input', { type: 'date', id: 'rt', 'aria-label': 'Até' });
+        from.value = ymd(new Date(now - 29 * DAY)); to.value = ymd(now);
+        var dates = h('span', { class: 'report__dates', hidden: true }, h('label', { class: 'sr', for: 'rf', text: 'De' }), from, h('span', { text: 'até' }), h('label', { class: 'sr', for: 'rt', text: 'Até' }), to);
+        var status = h('select', { id: 'rs', 'aria-label': 'Status' }, [['', 'Todos os status'], ['novo', 'Novos'], ['contatado', 'Contatados'], ['matriculado', 'Matriculados'], ['arquivado', 'Arquivados']].map(function (o) { return h('option', { value: o[0], text: o[1] }); }));
+        var area = h('div', { class: 'report', id: 'reportArea' });
+        var rowsNow = [], label = '';
+        view.appendChild(h('div', { class: 'bar report__controls' }, period, dates, status, h('span', { class: 'spacer' }),
+            h('button', { type: 'button', class: 'btn btn--line btn--sm', text: 'Exportar CSV', onclick: function () { csvFile(rowsNow, 'relatorio-itep-' + ymd(new Date()) + '.csv'); } }),
+            h('button', { type: 'button', class: 'btn btn--primary btn--sm', text: 'Imprimir / salvar PDF', onclick: function () { window.print(); } })));
+        view.appendChild(area);
+
+        function range() {
+            var p = period.value, t = startOf(now), a = null, b = null, txt;
+            if (p === '7' || p === '30' || p === '90') { a = new Date(t - (+p - 1) * DAY); b = t; txt = 'Últimos ' + p + ' dias'; }
+            else if (p === 'mes') { a = new Date(t.getFullYear(), t.getMonth(), 1); b = t; txt = 'Este mês'; }
+            else if (p === 'custom') { a = from.value ? new Date(from.value + 'T00:00:00') : null; b = to.value ? new Date(to.value + 'T00:00:00') : null; txt = 'Personalizado'; }
+            else txt = 'Todo o período';
+            var span = a && b ? pt(a) + ' a ' + pt(b) : (p === 'tudo' ? 'desde a primeira mensagem' : '');
+            return { a: a, b: b, label: txt + (span ? ' (' + span + ')' : '') };
+        }
+        function count(rows, key) { var m = {}; rows.forEach(function (l) { var v = (l[key] || '').trim(); if (v) m[v] = (m[v] || 0) + 1; }); return Object.keys(m).map(function (k) { return [k, m[k]]; }).sort(function (x, y) { return y[1] - x[1]; }); }
+        function bars(title, rows, max) {
+            var card = h('div', { class: 'card' }, h('h2', { text: title }));
+            if (!rows.length) { card.appendChild(h('p', { class: 'empty', text: 'Sem dados neste período.' })); return card; }
+            var top = rows.slice(0, max), peak = top[0][1], ul = h('ul', { class: 'bars' });
+            top.forEach(function (r) { var fill = h('i'); fill.style.width = Math.max(4, Math.round(r[1] / peak * 100)) + '%'; ul.appendChild(h('li', null, h('span', { class: 'bars__l', text: r[0] }), h('span', { class: 'bars__t' }, fill), h('b', { text: String(r[1]) }))); });
+            card.appendChild(ul); return card;
+        }
+        function chart(rows, a, b) {
+            var card = h('div', { class: 'card' }, h('h2', { text: 'Mensagens por ' }));
+            if (!rows.length) { card.querySelector('h2').textContent = 'Mensagens por dia'; card.appendChild(h('p', { class: 'empty', text: 'Sem mensagens neste período.' })); return card; }
+            var first = a || startOf(new Date(Math.min.apply(null, rows.map(function (l) { return +new Date(l.ts); })))), last = b || startOf(now);
+            var days = Math.round((last - first) / DAY) + 1, weekly = days > 62, buckets = [], i;
+            var step = weekly ? 7 : 1, n = Math.ceil(days / step);
+            for (i = 0; i < n; i++) buckets.push({ d: new Date(+first + i * step * DAY), n: 0 });
+            rows.forEach(function (l) { var d = startOf(new Date(l.ts)); var k = Math.floor((d - first) / DAY / step); if (k >= 0 && k < n) buckets[k].n++; });
+            card.querySelector('h2').textContent = 'Mensagens por ' + (weekly ? 'semana' : 'dia');
+            var W = 640, H = 170, pad = 26, peak = Math.max.apply(null, buckets.map(function (x) { return x.n; })) || 1, bw = (W - pad * 2) / n;
+            var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
+            svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('class', 'chart'); svg.setAttribute('role', 'img');
+            svg.setAttribute('aria-label', 'Gráfico de mensagens por ' + (weekly ? 'semana' : 'dia') + ', pico de ' + peak);
+            function node(tag, attrs, text) { var e = document.createElementNS(NS, tag); Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); }); if (text != null) e.textContent = text; return e; }
+            svg.appendChild(node('line', { x1: pad, y1: H - 22, x2: W - pad, y2: H - 22, stroke: '#DCE5DF' }));
+            buckets.forEach(function (x, k) {
+                var bh = Math.round((H - 52) * x.n / peak), bx = pad + k * bw;
+                var r = node('rect', { x: bx + Math.max(1, bw * 0.12), y: H - 22 - bh, width: Math.max(2, bw * 0.76), height: Math.max(x.n ? 2 : 0, bh), rx: 3, fill: x.n ? '#16783A' : '#E3F3E8' });
+                r.appendChild(node('title', {}, pt(x.d) + (weekly ? ' (semana)' : '') + ': ' + x.n)); svg.appendChild(r);
+                if (x.n && bw > 14) svg.appendChild(node('text', { x: bx + bw / 2, y: H - 26 - bh, 'text-anchor': 'middle', 'font-size': 10, fill: '#0E1D14' }, String(x.n)));
+            });
+            svg.appendChild(node('text', { x: pad, y: H - 6, 'font-size': 10, fill: '#4A5C51' }, pt(buckets[0].d)));
+            svg.appendChild(node('text', { x: W - pad, y: H - 6, 'text-anchor': 'end', 'font-size': 10, fill: '#4A5C51' }, pt(buckets[n - 1].d)));
+            card.appendChild(svg); return card;
+        }
+
+        function draw() {
+            dates.hidden = period.value !== 'custom';
+            var r = range();
+            var rows = leads.filter(function (l) {
+                var d = startOf(new Date(l.ts));
+                return (!r.a || d >= r.a) && (!r.b || d <= r.b) && (!status.value || l.status === status.value);
+            });
+            rowsNow = rows; label = r.label;
+            var by = { novo: 0, contatado: 0, matriculado: 0, arquivado: 0 }; rows.forEach(function (l) { by[l.status] = (by[l.status] || 0) + 1; });
+            var total = rows.length, rate = total ? Math.round(by.matriculado / total * 1000) / 10 : 0;
+            var daysN = r.a && r.b ? Math.round((r.b - r.a) / DAY) + 1 : (total ? Math.max(1, Math.round((startOf(now) - startOf(new Date(Math.min.apply(null, rows.map(function (l) { return +new Date(l.ts); }))))) / DAY) + 1) : 1);
+            var avg = total ? (Math.round(total / daysN * 10) / 10).toLocaleString('pt-BR') : '0';
+            area.textContent = '';
+            area.appendChild(h('header', { class: 'report__head' },
+                h('div', null, h('p', { class: 'report__kicker', text: 'ITEP · Trilhas do Futuro' }), h('h2', { text: 'Relatório de mensagens recebidas' }), h('p', { class: 'report__period', text: label + (status.value ? ' · status: ' + status.options[status.selectedIndex].text.toLowerCase() : '') })),
+                h('p', { class: 'report__gen', text: 'Gerado em ' + now.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) })));
+            function stat(n, t, cls) { return h('div', { class: 'stat' + (cls ? ' ' + cls : '') }, h('strong', { text: String(n) }), h('span', { text: t })); }
+            area.appendChild(h('div', { class: 'stats stats--6' }, stat(total, 'Mensagens no período'), stat(by.novo, 'Novas', 'stat--hot'), stat(by.contatado, 'Contatadas'), stat(by.matriculado, 'Matriculadas'), stat(rate.toLocaleString('pt-BR') + '%', 'Taxa de matrícula'), stat(avg, 'Média por dia')));
+            if (!total) { area.appendChild(h('p', { class: 'empty', style: 'margin-top:18px', text: leads.length ? 'Nenhuma mensagem neste período. Tente outro intervalo.' : 'Nenhuma mensagem recebida ainda. Elas chegam aqui pelos formulários do site.' })); return; }
+            area.appendChild(h('div', { style: 'margin-top:18px' }, chart(rows, r.a, r.b)));
+            area.appendChild(h('div', { class: 'two' }, bars('Cursos mais procurados', count(rows, 'course'), 10), bars('Cidades mais procuradas', count(rows, 'city'), 10)));
+            area.appendChild(h('div', { class: 'two' }, bars('Por situação', [['Novas', by.novo], ['Contatadas', by.contatado], ['Matriculadas', by.matriculado], ['Arquivadas', by.arquivado]].filter(function (x) { return x[1]; }).sort(function (x, y) { return y[1] - x[1]; }), 4), bars('Página de origem', count(rows, 'source'), 6)));
+            var LIM = 200, tbl = h('table', { class: 'tbl' }, h('thead', null, h('tr', null, ['Data', 'Nome', 'Cidade', 'Curso', 'Status'].map(function (t) { return h('th', { scope: 'col', text: t }); }))), h('tbody', null, rows.slice(0, LIM).map(function (l) { return h('tr', null, h('td', { text: fdate(l.ts) }), h('td', { text: l.name }), h('td', { text: l.city || '—' }), h('td', { text: l.course || '—' }), h('td', { text: l.status })); })));
+            area.appendChild(h('div', { class: 'card', style: 'margin-top:18px' }, h('h2', { text: 'Mensagens do período' }), h('div', { class: 'tbl-wrap' }, tbl), rows.length > LIM ? h('p', { class: 'hint', text: 'Mostrando as ' + LIM + ' mais recentes de ' + rows.length + '. Exporte o CSV para a lista completa.' }) : null));
+        }
+        [period, from, to, status].forEach(function (e) { e.addEventListener('change', draw); });
+        draw();
     };
 
     /* --- blog --- */

@@ -2,7 +2,8 @@
 
 Redesenho do site do **ITEP (Instituto Técnico Educacional Polivalente)**: 22 cursos técnicos, 13 municípios de Minas Gerais, blog e área restrita.
 
-**Versão para visualização (somente o site, sem painel):** https://thalesdom.github.io/itep/
+**Site:** https://thalesdom.github.io/itep/
+**Área restrita (demonstração, dados fictícios — senha `demo`):** https://thalesdom.github.io/itep/admin/
 
 ## O que tem aqui
 | Pasta/arquivo | O que é |
@@ -16,7 +17,8 @@ Redesenho do site do **ITEP (Instituto Técnico Educacional Polivalente)**: 22 c
 | `LEIA-ME-ADMIN.md` | instalação do painel na hospedagem |
 
 ## No GitHub Pages
-É só a vitrine: páginas, cursos, cidades, blog e formulários (que continuam enviando por e-mail/WhatsApp). O painel e o banco **não rodam no Pages**, porque exigem PHP e MySQL.
+É a vitrine: páginas, cursos, cidades, blog e formulários (que continuam enviando por e-mail/WhatsApp).
+O painel em `/admin/` roda em **modo demonstração**: a API é simulada no navegador, com mensagens fictícias, só para conhecer as telas (mensagens, **relatórios**, blog…). Nada é enviado a servidor, e as mensagens do site público **não** chegam nele. O painel de verdade precisa de PHP + MySQL.
 Para atualizar a vitrine depois de mudar o site: `node tools/build-pages.js itep` e `git push`.
 
 ## Site completo (com painel e banco)

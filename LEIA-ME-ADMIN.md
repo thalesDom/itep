@@ -1,7 +1,7 @@
 # ITEP — área restrita (PHP + MySQL)
 
 ## O que ela faz
-- **/admin/** — painel com login. Mensagens recebidas, blog, cidades (endereço, WhatsApp, redes, cursos), cursos (texto e foto), contato e redes do site, troca de senha.
+- **/admin/** — painel com login. **Mensagens recebidas** (com status, anotações e exportação em CSV), **Relatórios** (período, gráfico, rankings, impressão/PDF e CSV), e, em segundo plano, blog, cidades (endereço, WhatsApp, redes, cursos), cursos (texto e foto), contato e redes do site, troca de senha.
 - **Mensagens:** cada contato enviado pelos formulários (Contato, Seja nosso aluno e o formulário da home) é guardado no MySQL. O envio por e-mail e por WhatsApp que já existia continua igual.
 - O site público lê o conteúdo de `/api/site`. Se a API estiver fora do ar, as páginas continuam mostrando o conteúdo que já está nelas.
 
