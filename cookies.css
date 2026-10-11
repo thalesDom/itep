@@ -1,0 +1,91 @@
+/* ITEP — aviso de cookies (independente: funciona em qualquer página) */
+.ck, .ck * { box-sizing: border-box; }
+.ck {
+    --ck-verde-950: #072814; --ck-verde-900: #0F3D22; --ck-verde-700: #16783A; --ck-verde-600: #1B8F45; --ck-verde-100: #E3F3E8;
+    --ck-amarelo: #FFC21A; --ck-tinta: #0E1D14; --ck-suave: #4A5C51; --ck-linha: #DCE5DF; --ck-fundo: #F5F8F6;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; color: var(--ck-tinta); line-height: 1.55;
+}
+.ck h2, .ck h3 { font-family: 'Manrope', 'Inter', system-ui, sans-serif; letter-spacing: -.02em; margin: 0; }
+.ck button { font: inherit; cursor: pointer; border: 0; background: none; color: inherit; }
+.ck :focus-visible { outline: 3px solid var(--ck-amarelo); outline-offset: 3px; border-radius: 8px; }
+
+/* ---------- Banner ---------- */
+.ck-banner {
+    position: fixed; z-index: 2000; left: 12px; right: 12px; bottom: 12px; max-width: 460px;
+    padding: 22px; background: #fff; border-radius: 26px; border: 1px solid var(--ck-linha);
+    box-shadow: 0 40px 80px -24px rgba(7, 40, 20, .55), 0 0 0 1px rgba(255, 255, 255, .6) inset;
+    transform: translateY(24px); opacity: 0; visibility: hidden;
+    transition: transform .5s cubic-bezier(.2, .8, .2, 1), opacity .4s, visibility .4s;
+}
+.ck-banner.is-open { transform: none; opacity: 1; visibility: visible; }
+.ck-banner::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 5px; border-radius: 26px 26px 0 0; background: linear-gradient(90deg, var(--ck-verde-700), var(--ck-amarelo)); }
+.ck-head { display: flex; align-items: center; gap: 14px; }
+.ck-ico { flex: none; width: 52px; height: 52px; display: grid; place-items: center; border-radius: 16px; background: var(--ck-amarelo); color: var(--ck-tinta); transform: rotate(-6deg); box-shadow: 0 12px 20px -10px rgba(255, 194, 26, .9); }
+.ck-ico svg { width: 28px; height: 28px; }
+.ck-banner h2 { font-size: 1.25rem; font-weight: 800; line-height: 1.2; }
+.ck-text { margin: 14px 0 0; font-size: .9375rem; color: var(--ck-suave); }
+.ck-text a { color: var(--ck-verde-700); font-weight: 600; text-decoration: underline; }
+.ck-actions { display: grid; gap: 10px; margin-top: 18px; }
+.ck-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 20px; font-family: 'Manrope', 'Inter', sans-serif; font-weight: 700; font-size: .9688rem; line-height: 1.2; border-radius: 12px; transition: background-color .2s, color .2s, transform .2s, box-shadow .2s; }
+.ck-btn--primary { color: #fff; background: var(--ck-verde-700); box-shadow: 0 10px 20px -10px rgba(22, 120, 58, .85); }
+.ck-btn--primary:hover { background: var(--ck-verde-900); transform: translateY(-2px); }
+.ck-btn--ghost { color: var(--ck-verde-700); box-shadow: inset 0 0 0 2px var(--ck-verde-700); }
+.ck-btn--ghost:hover { background: var(--ck-verde-700); color: #fff; }
+.ck-link { padding: 8px; font-weight: 600; font-size: .9375rem; color: var(--ck-suave); text-decoration: underline; text-underline-offset: 3px; }
+.ck-link:hover { color: var(--ck-verde-700); }
+
+/* ---------- Janela de preferências ---------- */
+.ck-modal { border: 0; padding: 0; margin: auto; width: min(620px, calc(100% - 24px)); max-height: 92vh; overflow: hidden; border-radius: 28px; background: #fff; color: var(--ck-tinta); box-shadow: 0 50px 110px -20px rgba(0, 0, 0, .6); }
+.ck-modal::backdrop { background: rgba(7, 40, 20, .65); backdrop-filter: blur(5px); }
+.ck-modal[open] { display: flex; flex-direction: column; animation: ck-pop .3s cubic-bezier(.2, .8, .2, 1); }
+@keyframes ck-pop { from { opacity: 0; transform: translateY(18px) scale(.98); } }
+.ck-modal__head { position: relative; padding: 26px 26px 18px; background: linear-gradient(150deg, var(--ck-verde-700), var(--ck-verde-950)); color: #fff; }
+.ck-modal__head h2 { font-size: 1.5rem; font-weight: 800; }
+.ck-modal__head p { margin: 8px 0 0; color: #D2EBD9; font-size: .9688rem; max-width: 46ch; }
+.ck-close { position: absolute; top: 14px; right: 14px; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, .16); color: #fff; transition: background-color .2s, color .2s, transform .2s; }
+.ck-close:hover { background: var(--ck-amarelo); color: var(--ck-tinta); transform: rotate(90deg); }
+.ck-close svg { width: 20px; height: 20px; }
+.ck-list { margin: 0; padding: 14px 18px; list-style: none; overflow-y: auto; display: grid; gap: 10px; }
+.ck-item { display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; align-items: start; padding: 16px 18px; background: var(--ck-fundo); border-radius: 18px; }
+.ck-item h3 { font-size: 1.0625rem; font-weight: 800; line-height: 1.25; }
+.ck-item p { grid-column: 1; margin: 4px 0 0; font-size: .9063rem; color: var(--ck-suave); }
+.ck-item small { grid-column: 1; display: inline-block; margin-top: 6px; padding: 2px 10px; font-size: .75rem; font-weight: 700; color: var(--ck-verde-700); background: var(--ck-verde-100); border-radius: 999px; justify-self: start; }
+.ck-item .ck-switch { grid-column: 2; grid-row: 1 / span 2; }
+.ck-switch { position: relative; width: 52px; height: 30px; flex: none; }
+.ck-switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; z-index: 1; }
+.ck-switch span { position: absolute; inset: 0; border-radius: 999px; background: #C4D0C8; transition: background-color .25s; }
+.ck-switch span::after { content: ''; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, .25); transition: transform .25s cubic-bezier(.34, 1.56, .64, 1); }
+.ck-switch input:checked + span { background: var(--ck-verde-600); }
+.ck-switch input:checked + span::after { transform: translateX(22px); }
+.ck-switch input:disabled { cursor: not-allowed; }
+.ck-switch input:disabled + span { background: var(--ck-verde-700); opacity: .55; }
+.ck-switch input:focus-visible + span { outline: 3px solid var(--ck-amarelo); outline-offset: 3px; }
+.ck-modal__foot { display: grid; gap: 10px; padding: 16px 18px 20px; border-top: 1px solid var(--ck-linha); background: #fff; }
+
+/* A bolinha do WhatsApp sai da frente do aviso no celular */
+@media (max-width: 699px) {
+    html.ck-open .wa-float, html.ck-open .whatsapp-float { opacity: 0; pointer-events: none; }
+}
+@media (min-width: 700px) {
+    .ck-banner { left: 20px; bottom: 20px; right: auto; width: 460px; padding: 26px; }
+    .ck-actions { grid-template-columns: 1fr 1fr; }
+    .ck-actions .ck-link { grid-column: 1 / -1; justify-self: center; }
+    .ck-modal__head { padding: 32px 32px 22px; }
+    .ck-list { padding: 18px 24px; }
+    .ck-modal__foot { grid-template-columns: 1fr 1fr; padding: 18px 24px 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ck-banner, .ck-modal[open], .ck-switch span, .ck-switch span::after, .ck-btn, .ck-close { transition: none !important; animation: none !important; }
+}
+
+/* especificidade maior que o reset ".ck button" */
+.ck .ck-btn--primary { color: #fff; background: var(--ck-verde-700); }
+.ck .ck-btn--primary:hover { background: var(--ck-verde-900); }
+.ck .ck-btn--ghost { background: transparent; color: var(--ck-verde-700); }
+.ck .ck-btn--ghost:hover { background: var(--ck-verde-700); color: #fff; }
+.ck .ck-link { color: var(--ck-suave); }
+.ck .ck-link:hover { color: var(--ck-verde-700); }
+.ck .ck-close { background: rgba(255, 255, 255, .16); color: #fff; }
+.ck .ck-close:hover { background: var(--ck-amarelo); color: var(--ck-tinta); }
+.ck .ck-modal__head h2 { padding-right: 52px; }
+.ck-banner { overflow: hidden; }

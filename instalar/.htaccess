@@ -1,0 +1,2 @@
+# a pasta deve ser APAGADA após a instalação; enquanto existir, só o index.php responde
+Options -Indexes

@@ -1,0 +1,29 @@
+# ITEP — Apache (mod_rewrite). Para Nginx, veja LEIA-ME-ADMIN.md
+Options -Indexes
+DirectoryIndex index.html index.php
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# nunca servir arquivos ocultos, SQL, configuração ou documentação interna
+<FilesMatch "(^\.|\.sql$|\.md$|\.bat$|\.lock$|^config\.php$|^seed\.json$)">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # API
+    RewriteRule ^api/(?!index\.php$)(.*)$ api/index.php [L,QSA]
+    # artigos novos do blog (sem pasta própria) usam o modelo de artigo
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^blog/([a-z0-9\-]+)(?:/(?:index\.html)?)?$ blog/artigo/index.html [L]
+</IfModule>
+
+# pasta de capturas de tela usada só no desenvolvimento
+<IfModule mod_rewrite.c>
+    RewriteRule ^prints/ - [F,L]
+</IfModule>

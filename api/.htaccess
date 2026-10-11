@@ -1,0 +1,10 @@
+# só o index.php é acessível pela web
+<FilesMatch "\.php$">
+    Require all denied
+</FilesMatch>
+<Files "index.php">
+    Require all granted
+</Files>
+<FilesMatch "\.(sql|json|lock)$">
+    Require all denied
+</FilesMatch>

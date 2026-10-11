@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seja nosso aluno | ITEP</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        // Inicializa EmailJS com sua chave pública
+        (function() {
+            emailjs.init("YOUR_PUBLIC_KEY"); // SUBSTITUA pela sua chave pública do EmailJS
+        })();
+    </script>
+    <link rel="stylesheet" href="/itep/cookies.css">
+    <link rel="icon" href="/itep/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/itep/favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="/itep/apple-touch-icon.png">
+    <meta name="theme-color" content="#0F3D22">
+    <meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+    <script src="/itep/preload.js"></script>
+    <!-- Header -->
+    <header class="form-header">
+        <div class="header-content">
+            <a href="/itep/">
+                <div class="logo">
+                    <div class="logo-img">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h2>ITEP</h2>
+                        <span>Trilhas do Futuro</span>
+                    </div>
+                </div>
+            </a>
+            
+            <div class="progress-indicator">
+                <span class="step-counter">
+                    <span id="currentStep">1</span>/<span id="totalSteps">6</span>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="form-container">
+        <div class="form-wrapper">
+            <!-- Progress Bar -->
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <!-- Form Steps -->
+            <form id="multiStepForm" class="multi-step-form">
+                
+                <!-- Step 1: Welcome -->
+                <div class="form-step active" data-step="1">
+                    <div class="step-content welcome-step">
+                        <div class="avatar-container">
+                            <div class="avatar">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div class="avatar-pulse"></div>
+                        </div>
+                        <h1 class="step-title">Olá! Bem-vindo(a) ao ITEP</h1>
+                        <h2 class="step-subtitle">
+                            Vamos iniciar sua jornada em um 
+                            <span class="highlight">curso técnico gratuito!</span>
+                        </h2>
+                        <p class="step-description">
+                            Preencha este formulário rápido e nossa equipe entrará em contato para ajudá-lo(a) a dar o próximo passo em sua carreira profissional.
+                        </p>
+                        <button type="button" class="btn btn-primary btn-next">
+                            <span>Vamos começar!</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Nome -->
+                <div class="form-step" data-step="2">
+                    <button type="button" class="btn-back">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="step-content">
+                        <h2 class="step-title">
+                            Qual o seu <span class="highlight">nome completo?</span>
+                        </h2>
+                        <div class="input-group">
+                            <label for="nome">Nome Completo *</label>
+                            <input 
+                                type="text" 
+                                id="nome" 
+                                name="nome" 
+                                placeholder="Digite seu nome completo"
+                                required
+                                autocomplete="name"
+                            >
+                            <span class="input-icon"><i class="fas fa-user"></i></span>
+                            <span class="error-message"></span>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-next">
+                            <span>Próximo</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Telefone -->
+                <div class="form-step" data-step="3">
+                    <button type="button" class="btn-back">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="step-content">
+                        <h2 class="step-title">
+                            Qual o seu <span class="highlight">telefone?</span>
+                        </h2>
+                        <p class="step-description">Vamos usar para entrar em contato via WhatsApp</p>
+                        <div class="input-group">
+                            <label for="telefone">Telefone/WhatsApp *</label>
+                            <input 
+                                type="tel" 
+                                id="telefone" 
+                                name="telefone" 
+                                placeholder="(00) 00000-0000"
+                                required
+                                autocomplete="tel"
+                            >
+                            <span class="input-icon"><i class="fab fa-whatsapp"></i></span>
+                            <span class="error-message"></span>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-next">
+                            <span>Próximo</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Email -->
+                <div class="form-step" data-step="4">
+                    <button type="button" class="btn-back">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="step-content">
+                        <h2 class="step-title">
+                            E o seu <span class="highlight">e-mail?</span>
+                        </h2>
+                        <div class="input-group">
+                            <label for="email">E-mail *</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                placeholder="seuemail@exemplo.com"
+                                required
+                                autocomplete="email"
+                            >
+                            <span class="input-icon"><i class="fas fa-envelope"></i></span>
+                            <span class="error-message"></span>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-next">
+                            <span>Próximo</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Localização -->
+                <div class="form-step" data-step="5">
+                    <button type="button" class="btn-back">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="step-content">
+                        <h2 class="step-title">
+                            Escolha a unidade <span class="highlight">mais próxima de você!</span>
+                        </h2>
+                        <div class="input-group">
+                            <label for="cidade">Cidade *</label>
+                            <select id="cidade" name="cidade" required>
+                                <option value="">Selecione sua cidade</option>
+                                <option value="Almenara">Almenara - MG</option>
+                                <option value="Araçuaí">Araçuaí - MG</option>
+                                <option value="Cachoeira de Pajeú">Cachoeira de Pajeú - MG</option>
+                                <option value="Curral de Dentro">Curral de Dentro - MG</option>
+                                <option value="Divisa Alegre">Divisa Alegre - MG</option>
+                                <option value="Divisópolis">Divisópolis - MG</option>
+                                <option value="Itaobim">Itaobim - MG</option>
+                                <option value="Jordânia">Jordânia - MG</option>
+                                <option value="Mata Verde">Mata Verde - MG</option>
+                                <option value="Medina">Medina - MG</option>
+                                
+                                <option value="Pedra Azul">Pedra Azul - MG</option>
+                                <option value="Rio do Prado">Rio do Prado - MG</option>
+                                <option value="Salto da Divisa">Salto da Divisa - MG</option>
+                            </select>
+                            <span class="input-icon"><i class="fas fa-map-marker-alt"></i></span>
+                            <span class="error-message"></span>
+                        </div>
+                        <button type="button" class="btn btn-primary btn-next">
+                            <span>Próximo</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 6: Curso -->
+                <div class="form-step" data-step="6">
+                    <button type="button" class="btn-back">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <div class="step-content">
+                        <h2 class="step-title">
+                            Escolha o <span class="highlight">curso</span> do seu interesse.
+                        </h2>
+                        <div class="input-group">
+                            <label for="curso">Curso de Interesse *</label>
+                            <select id="curso" name="curso" required>
+                                <option value="">Selecione o curso</option>
+                                <optgroup label="Gestão e Negócios"><option value="Administração">Administração</option><option value="Comércio Exterior">Comércio Exterior</option><option value="Contabilidade">Contabilidade</option><option value="Logística">Logística</option><option value="Marketing">Marketing</option><option value="Recursos Humanos">Recursos Humanos</option><option value="Serviços Jurídicos">Serviços Jurídicos</option></optgroup>
+                                    <optgroup label="Ambiente e Saúde"><option value="Análises Clínicas">Análises Clínicas</option><option value="Gerência em Saúde">Gerência em Saúde</option><option value="Meio Ambiente">Meio Ambiente</option><option value="Enfermagem">Enfermagem</option><option value="Farmácia">Farmácia</option><option value="Nutrição e Dietética">Nutrição e Dietética</option><option value="Prótese Dentária">Prótese Dentária</option><option value="Radiologia">Radiologia</option><option value="Saúde Bucal">Saúde Bucal</option><option value="Vigilância em Saúde">Vigilância em Saúde</option></optgroup>
+                                    <optgroup label="Indústria, Recursos Naturais e Segurança"><option value="Agronegócio">Agronegócio</option><option value="Geologia">Geologia</option><option value="Mineração">Mineração</option><option value="Segurança do Trabalho">Segurança do Trabalho</option></optgroup>
+                                    <optgroup label="Design e Ambientes"><option value="Design de Interiores">Design de Interiores</option></optgroup>
+                            </select>
+                            <span class="input-icon"><i class="fas fa-book"></i></span>
+                            <span class="error-message"></span>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-submit">
+                            <span>Enviar Formulário</span>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 7: Success -->
+                <div class="form-step" data-step="7">
+                    <div class="step-content success-step">
+                        <div class="success-animation">
+                            <div class="success-circle">
+                                <i class="fas fa-check"></i>
+                            </div>
+                        </div>
+                        <h1 class="step-title">Formulário enviado com sucesso!</h1>
+                        <p class="step-description">
+                            Obrigado por seu interesse! Em breve, alguém da nossa equipe comercial entrará em contato com você.
+                        </p>
+                        <div class="success-actions">
+                            <a href="/itep/" class="btn btn-outline">
+                                <i class="fas fa-home"></i>
+                                <span>Voltar para o início</span>
+                            </a>
+                            <a href="https://wa.me/5533998043901" class="btn btn-primary" target="_blank">
+                                <i class="fab fa-whatsapp"></i>
+                                <span>Falar agora no WhatsApp</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- WhatsApp Float Button -->
+    <div class="whatsapp-float">
+        <a href="https://wa.me/5533998043901" target="_blank" aria-label="Contato via WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="/itep/cookies.js" defer></script>
+    <script src="/itep/totop.js" defer></script>
+</body>
+</html>
