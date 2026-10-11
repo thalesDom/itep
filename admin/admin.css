@@ -163,3 +163,14 @@ a.btn { text-decoration: none; }
 .row__txt span, .lead__meta span { overflow-wrap: anywhere; }
 .content, .card, .lead, .row { min-width: 0; }
 img.preview[hidden] { display: none; }
+
+/* textos longos nunca estouram a tela (nomes colados, e-mails e endereços compridos) */
+.lead__name, .row__txt strong, .rank li span, .stat span, .lead__meta b, .lead__msg { overflow-wrap: anywhere; word-break: break-word; min-width: 0; }
+.rank li, .lead__head, .lead__meta, .row, .row__txt { min-width: 0; }
+.rank li span { flex: 1 1 auto; }
+.rank li b, .rank li .pill { flex: none; }
+.lead__head { flex-wrap: wrap; }
+.lead__name { flex: 1 1 12rem; }
+.lead__date { margin-left: 0; }
+@media (min-width: 600px) { .lead__date { margin-left: auto; } }
+@media (pointer: coarse), (max-width: 599px) { .btn--sm { min-width: 44px; } }
