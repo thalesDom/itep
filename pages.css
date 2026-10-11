@@ -317,8 +317,8 @@ a.fact:hover strong { color: var(--verde-700); }
 }
 
 /* iPhone/Safari: nada alarga a página */
-html { overflow-x: clip; max-width: 100%; }
-body { overflow-x: clip; max-width: 100%; }
+html { overflow-x: hidden; overflow-x: clip; max-width: 100%; }
+body { overflow-x: hidden; overflow-x: clip; max-width: 100%; }
 @media (max-width: 699px) { .rv[data-rv="left"], .rv[data-rv="right"] { transform: translateY(18px); } }
 
 /* títulos das páginas internas: menores e mais refinados */
