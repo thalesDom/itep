@@ -872,3 +872,15 @@ body { overflow-x: clip; max-width: 100%; position: relative; }
 }
 section, footer { overflow-x: clip; }
 @media (max-width: 699px) { .cities__mark, .purpose__glow, .cta__glow { display: none; } }
+
+/* ===== TÍTULOS DO TOPO: menores, com régua amarela e destaque marcador ===== */
+.footer__col .footer__admin { display: inline-flex; align-items: center; gap: 10px; align-self: flex-start; margin-top: 10px; padding: 11px 20px 11px 16px; min-height: 44px; font-family: var(--font-display); font-weight: 700; font-size: .9375rem; color: var(--amarelo); background: rgba(255, 194, 26, .08); border-radius: 999px; box-shadow: inset 0 0 0 1.5px rgba(255, 194, 26, .55); text-decoration: none; transition: background-color .25s, color .25s, transform .25s, box-shadow .25s; }
+.footer__col .footer__admin [data-lucide] { width: 18px; height: 18px; }
+.footer__col .footer__admin:hover { background: var(--amarelo); color: var(--tinta); text-decoration: none; transform: translateY(-2px); box-shadow: 0 14px 26px -12px rgba(255, 194, 26, .8); }
+.hero h1, .hero__title, .pg-hero h1 { font-weight: 800; letter-spacing: -.035em; line-height: 1.08; text-wrap: balance; }
+.hero h1 span, .hero__title span, .pg-hero h1 span { color: var(--amarelo); background: linear-gradient(transparent 80%, rgba(255, 194, 26, .28) 80%); padding: 0 .06em; }
+@media (min-width: 700px) {
+    .hero h1, .hero__title { font-size: clamp(2.25rem, 4.2vw, 3.5rem); max-width: 19ch; }
+    .hero__lead { font-size: 1.125rem; max-width: 52ch; color: #DCEEE2; }
+    .hero__badge { background: rgba(255, 194, 26, .14); border-color: rgba(255, 194, 26, .45); }
+}
