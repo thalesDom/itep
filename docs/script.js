@@ -270,4 +270,36 @@
         window.open('https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
         form.reset();
     });
+
+    /* acordeão dos grupos de cursos no menu do celular */
+    (function () {
+        var cols = document.querySelectorAll('.sub--wide .sub__col');
+        cols.forEach(function (col) {
+            var h = col.querySelector('h3'); if (!h) return;
+            h.setAttribute('role', 'button'); h.setAttribute('tabindex', '0'); h.setAttribute('aria-expanded', 'false');
+            function toggle() {
+                if (window.matchMedia('(min-width: 1000px)').matches) return;
+                var open = !col.classList.contains('is-open');
+                col.classList.toggle('is-open', open); h.setAttribute('aria-expanded', String(open));
+            }
+            h.addEventListener('click', toggle);
+            h.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+        });
+    })();
+
+    /* carrossel de cursos no celular: barra de progresso e dica de deslizar */
+    (function () {
+        var grid = document.getElementById('courseGrid'); if (!grid) return;
+        var wrap = document.createElement('div'); wrap.className = 'courses-progress';
+        var bar = document.createElement('i'); wrap.appendChild(bar);
+        var hint = document.createElement('p'); hint.className = 'courses-hint'; hint.textContent = 'Deslize para ver todos os cursos';
+        grid.parentNode.insertBefore(wrap, grid.nextSibling); grid.parentNode.insertBefore(hint, wrap.nextSibling);
+        function upd() {
+            var max = grid.scrollWidth - grid.clientWidth;
+            var ratio = max > 0 ? grid.scrollLeft / max : 0, size = max > 0 ? grid.clientWidth / grid.scrollWidth : 1;
+            bar.style.width = Math.max(14, size * 100) + '%'; bar.style.transform = 'translateX(' + (ratio * (100 / size - 100)) + '%)';
+        }
+        grid.addEventListener('scroll', upd, { passive: true }); window.addEventListener('resize', upd); upd();
+        document.querySelectorAll('.filter').forEach(function (f) { f.addEventListener('click', function () { grid.scrollTo({ left: 0 }); setTimeout(upd, 60); }); });
+    })();
 })();

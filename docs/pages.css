@@ -304,3 +304,14 @@ a.fact:hover strong { color: var(--verde-700); }
 .art__all { margin-top: 36px; text-align: center; }
 @media (min-width: 700px) { .bgrid { grid-template-columns: repeat(2, 1fr); gap: 22px; } .art__cta { flex-direction: row; flex-wrap: wrap; } .art__img { margin-top: -88px; } }
 @media (min-width: 1000px) { .bgrid { grid-template-columns: repeat(3, 1fr); } .art__img { margin-top: -110px; } }
+
+/* ===== TOQUES (auditoria do celular) ===== */
+@media (max-width: 999px) {
+    .crumbs { gap: 0 4px; margin-bottom: 14px; }
+    .crumbs a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; margin: 0 -6px; }
+    .area li a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; }
+    .where__list a { min-height: 44px; }
+    a.fact { min-height: 56px; }
+    .doc__body a, .defs a { display: inline-block; padding: 10px 0; }
+    .bcard, .tile { -webkit-tap-highlight-color: transparent; }
+}

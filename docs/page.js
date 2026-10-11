@@ -48,4 +48,20 @@
     document.addEventListener('click', function (e) {
         if (!e.target.closest('.has-sub')) subs.forEach(function (o) { o.classList.remove('is-open'); });
     });
+
+    /* acordeão dos grupos de cursos no menu do celular */
+    (function () {
+        var cols = document.querySelectorAll('.sub--wide .sub__col');
+        cols.forEach(function (col) {
+            var h = col.querySelector('h3'); if (!h) return;
+            h.setAttribute('role', 'button'); h.setAttribute('tabindex', '0'); h.setAttribute('aria-expanded', 'false');
+            function toggle() {
+                if (window.matchMedia('(min-width: 1000px)').matches) return;
+                var open = !col.classList.contains('is-open');
+                col.classList.toggle('is-open', open); h.setAttribute('aria-expanded', String(open));
+            }
+            h.addEventListener('click', toggle);
+            h.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+        });
+    })();
 })();
