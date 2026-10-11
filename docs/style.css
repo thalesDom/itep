@@ -835,3 +835,13 @@ a.post { text-decoration: none; }
     .footer__social a { width: 48px; height: 48px; }
     .contact__list a { display: inline-flex; align-items: center; min-height: 44px; }
 }
+
+/* ===== CELULAR: topo compacto, busca dentro do hero, sem cobrir os ícones ===== */
+@media (max-width: 699px) {
+    .hero__searchwrap { transform: none; margin: 0; }
+    .hero { padding-bottom: 28px; }
+    .hero__content { min-height: 0; padding-bottom: 64px; padding-top: 32px; }
+    .hero__ctrl { bottom: calc(var(--sh, 320px) + 34px); }
+    .trust { padding: 40px 0 36px; }
+    html .totop { left: auto; right: 14px; bottom: 78px; width: 40px; height: 40px; }
+}
