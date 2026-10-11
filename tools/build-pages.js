@@ -1,7 +1,6 @@
 /* Gera a versão ESTÁTICA do site em /docs para o GitHub Pages.
    O Pages serve o site em /<repositório>/, então todo link que começa com "/" precisa receber o prefixo.
-   O painel (/admin/) entra em MODO DEMONSTRAÇÃO: API simulada no navegador, dados fictícios.
-   Fica de fora: API real, instalador e uploads (precisam de PHP + MySQL).
+   A área restrita (/admin/), a API, o instalador e os uploads NÃO vão para o GitHub: rodam só no servidor próprio (PHP + MySQL).
    Uso:  node tools/build-pages.js [nome-do-repositório]      (padrão: itep) */
 'use strict';
 const fs = require('fs');
@@ -12,7 +11,7 @@ const OUT = path.join(ROOT, 'docs');
 // aceita só o NOME do repositório (o Git Bash converteria '/itep' num caminho do Windows)
 const PREFIX = '/' + path.basename(String(process.argv[2] || 'itep').replace(/[\\/]+$/, ''));
 if (!/^\/[A-Za-z0-9._-]+$/.test(PREFIX)) { console.error('Prefixo inválido: ' + PREFIX); process.exit(1); }
-const SKIP_DIRS = new Set(['docs', 'tools', 'api', 'instalar', 'uploads', 'prints', '.git', 'node_modules']);
+const SKIP_DIRS = new Set(['docs', 'tools', 'api', 'admin', 'instalar', 'uploads', 'prints', '.git', 'node_modules']);
 const SKIP_FILES = /(^\.|\.php$|\.md$|\.bat$|\.sql$|\.lock$|^seed\.json$|^site-data\.js$|^lead-beacon\.js$)/;
 const SKIP_PAGES = new Set(['blog/artigo']); // modelo que depende da API
 
@@ -38,17 +37,14 @@ function transformHtml(h) {
     h = h.replace(/(\s(?:href|src|action)=")\/(?!\/)/g, `$1${PREFIX}/`);
     // sem API no Pages: remove os scripts que dependem dela
     h = h.replace(/\s*<script src="[^"]*\/(?:site-data|lead-beacon)\.js"[^>]*><\/script>/g, '');
+    // a área restrita não existe na cópia pública: remove o botão que leva até ela
+    h = h.replace(/\s*<a class="footer__admin"[^>]*>[\s\S]*?<\/a>/g, '');
     // cópia de demonstração: fora dos buscadores
     if (!/name="robots"/.test(h)) h = h.replace('</head>', '    <meta name="robots" content="noindex, nofollow">\n</head>');
     return h;
 }
 
 copyDir(ROOT, OUT, '');
-// painel em modo demonstração: API simulada + dados de exemplo
-fs.copyFileSync(path.join(__dirname, 'demo-api.js'), path.join(OUT, 'admin', 'demo-api.js'));
-fs.copyFileSync(path.join(ROOT, 'api', 'seed.json'), path.join(OUT, 'admin', 'demo-seed.json'));
-const ai = path.join(OUT, 'admin', 'index.html');
-fs.writeFileSync(ai, fs.readFileSync(ai, 'utf8').replace('<script src="admin.js"></script>', '<script src="demo-api.js"></script>\n    <script src="admin.js"></script>'));
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
 fs.writeFileSync(path.join(OUT, '404.html'), `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Página não encontrada | ITEP</title><link rel="icon" href="${PREFIX}/favicon.svg" type="image/svg+xml"><style>body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;font-family:system-ui,sans-serif;color:#fff;text-align:center;background:linear-gradient(160deg,#0F3D22,#072814)}h1{font-size:clamp(2rem,6vw,3.5rem);margin:0 0 12px}p{margin:0 0 24px;color:#BFE0C9}a{display:inline-block;padding:14px 26px;border-radius:12px;background:#FFC21A;color:#0E1D14;font-weight:700;text-decoration:none}</style></head><body><main><h1>Página não encontrada</h1><p>O endereço pode ter mudado ou não existe.</p><a href="${PREFIX}/">Voltar ao início</a></main></body></html>`);
