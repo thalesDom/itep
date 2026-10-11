@@ -113,7 +113,7 @@
         var lead = document.querySelector('.pg-hero__lead'); if (lead) lead.textContent = n + (n === 1 ? ' curso técnico gratuito' : ' cursos técnicos gratuitos') + ' em ' + city.name + ', Minas Gerais. Fale com a equipe e garanta sua vaga.';
         var eb = document.querySelector('#cursos .pg-head .eyebrow'); if (eb) eb.textContent = 'Cursos em ' + city.name;
         var soc = document.querySelector('.unit-social');
-        var links = [['facebook', 'Facebook da unidade', city.facebook], ['instagram', 'Instagram da unidade', city.instagram]].filter(function (x) { return /^https?:\/\//i.test(x[2]); });
+        var links = [['facebook', 'Facebook do ITEP', city.facebook], ['instagram', 'Instagram do ITEP', city.instagram]].filter(function (x) { return /^https?:\/\//i.test(x[2]); });
         if (!soc && links.length && grid) { soc = el('p', 'unit-social'); grid.parentNode.appendChild(soc); }
         if (soc) { soc.textContent = ''; links.forEach(function (x) { var a = el('a', 'btn btn--line'); a.href = x[2]; a.target = '_blank'; a.rel = 'noopener'; a.appendChild(icon(x[0])); a.appendChild(document.createTextNode(' ' + x[1])); soc.appendChild(a); soc.appendChild(document.createTextNode(' ')); }); }
         icons();

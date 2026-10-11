@@ -1,6 +1,7 @@
 /* Gera a versão ESTÁTICA do site em /docs para o GitHub Pages.
    O Pages serve o site em /<repositório>/, então todo link que começa com "/" precisa receber o prefixo.
-   A área restrita (/admin/), a API, o instalador e os uploads NÃO vão para o GitHub: rodam só no servidor próprio (PHP + MySQL).
+   O painel (/admin/), a API e o instalador estão no repositório, mas não rodam no GitHub Pages (precisam de PHP + MySQL):
+   aqui /admin/ vira uma página explicativa.
    Uso:  node tools/build-pages.js [nome-do-repositório]      (padrão: itep) */
 'use strict';
 const fs = require('fs');
@@ -37,14 +38,14 @@ function transformHtml(h) {
     h = h.replace(/(\s(?:href|src|action)=")\/(?!\/)/g, `$1${PREFIX}/`);
     // sem API no Pages: remove os scripts que dependem dela
     h = h.replace(/\s*<script src="[^"]*\/(?:site-data|lead-beacon)\.js"[^>]*><\/script>/g, '');
-    // a área restrita não existe na cópia pública: remove o botão que leva até ela
-    h = h.replace(/\s*<a class="footer__admin"[^>]*>[\s\S]*?<\/a>/g, '');
     // cópia de demonstração: fora dos buscadores
     if (!/name="robots"/.test(h)) h = h.replace('</head>', '    <meta name="robots" content="noindex, nofollow">\n</head>');
     return h;
 }
 
 copyDir(ROOT, OUT, '');
+fs.mkdirSync(path.join(OUT, 'admin'), { recursive: true });
+fs.writeFileSync(path.join(OUT, 'admin', 'index.html'), `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Área restrita | ITEP</title><link rel="icon" href="${PREFIX}/favicon.svg" type="image/svg+xml"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Manrope:wght@800&display=swap" rel="stylesheet"><style>*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;font-family:Inter,system-ui,sans-serif;color:#0E1D14;background:linear-gradient(160deg,#0F3D22,#072814)}.card{width:min(460px,100%);padding:34px 28px;text-align:center;background:#fff;border-radius:26px;box-shadow:0 40px 80px -24px rgba(0,0,0,.6)}.ico{width:58px;height:58px;margin:0 auto 16px;display:grid;place-items:center;border-radius:18px;color:#fff;background:linear-gradient(135deg,#1B8F45,#0F3D22)}h1{margin:0 0 10px;font:800 1.5rem Manrope,Inter,sans-serif;letter-spacing:-.02em}p{margin:0 0 22px;color:#4A5C51;line-height:1.6}a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;font-weight:600;color:#fff;text-decoration:none;background:#16783A;border-radius:14px}a:focus-visible{outline:3px solid #FFC21A;outline-offset:3px}</style></head><body><main class="card"><div class="ico"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><h1>Área restrita</h1><p>O painel do ITEP funciona no servidor oficial do site (PHP + MySQL) e recebe as mensagens dos formulários. Esta é a cópia de demonstração, que não tem painel.</p><a href="${PREFIX}/">Voltar ao site</a></main></body></html>`);
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 fs.writeFileSync(path.join(OUT, 'robots.txt'), 'User-agent: *\nDisallow: /\n');
 fs.writeFileSync(path.join(OUT, '404.html'), `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Página não encontrada | ITEP</title><link rel="icon" href="${PREFIX}/favicon.svg" type="image/svg+xml"><style>body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;font-family:system-ui,sans-serif;color:#fff;text-align:center;background:linear-gradient(160deg,#0F3D22,#072814)}h1{font-size:clamp(2rem,6vw,3.5rem);margin:0 0 12px}p{margin:0 0 24px;color:#BFE0C9}a{display:inline-block;padding:14px 26px;border-radius:12px;background:#FFC21A;color:#0E1D14;font-weight:700;text-decoration:none}</style></head><body><main><h1>Página não encontrada</h1><p>O endereço pode ter mudado ou não existe.</p><a href="${PREFIX}/">Voltar ao início</a></main></body></html>`);

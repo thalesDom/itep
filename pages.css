@@ -330,3 +330,4 @@ a[href="#"][aria-label="Facebook"], a[href="#"][aria-label="Instagram"] { displa
 a[href^="mailto:"] { overflow-wrap: anywhere; }
 .fact, .fact > div, .defs li, .defs li > *, .ccard, .ccard > * { min-width: 0; max-width: 100%; }
 .fact strong, .defs a { overflow-wrap: anywhere; }
+a[href^="mailto:"], .fact strong, .defs a { overflow-wrap: normal; word-break: normal; }

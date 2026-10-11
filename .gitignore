@@ -1,11 +1,4 @@
-# nunca publicar: a área restrita e o backend ficam só no servidor próprio
-admin/
-api/
-instalar/
-servidor-local.php
-iniciar-local.bat
-LEIA-ME-ADMIN.md
-tools/demo-api.js
+# nunca publicar (segredos e arquivos do servidor)
 api/config.php
 instalar/install.lock
 uploads/*

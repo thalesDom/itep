@@ -943,3 +943,6 @@ a[href^="mailto:"], .topbar__mail { overflow-wrap: anywhere; }
 .footer__col a[href^="mailto:"] { font-size: .875rem; overflow-wrap: break-word; word-break: normal; }
 @media (max-width: 380px) { .footer__col a[href^="mailto:"] { font-size: .8125rem; } }
 @media (min-width: 900px) { .footer__top { grid-template-columns: 1.3fr .9fr .9fr 1.45fr; } }
+
+/* e-mail nunca corta no meio da palavra: só quebra de linha depois do @ */
+a[href^="mailto:"], .topbar__mail, .footer__col a[href^="mailto:"] { overflow-wrap: normal; word-break: normal; }
