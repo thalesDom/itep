@@ -315,3 +315,8 @@ a.fact:hover strong { color: var(--verde-700); }
     .doc__body a, .defs a { display: inline-block; padding: 10px 0; }
     .bcard, .tile { -webkit-tap-highlight-color: transparent; }
 }
+
+/* iPhone/Safari: nada alarga a página */
+html { overflow-x: clip; max-width: 100%; }
+body { overflow-x: clip; max-width: 100%; }
+@media (max-width: 699px) { .rv[data-rv="left"], .rv[data-rv="right"] { transform: translateY(18px); } }
