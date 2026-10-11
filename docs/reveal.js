@@ -26,7 +26,7 @@
         ['.head > *, .pg-head > *, .blog__head > *', 'up', false],
         ['.trust__item', 'up', true],
         ['.courses .card', mobile ? null : 'scale', true],
-        ['.steps__list .step', 'up', true],
+        ['.steps__list .step', null, false],
         ['.steps__foot > *', 'up', false],
         ['.cities__list li', 'scale', true],
         ['.about__media', 'mask', false],
@@ -48,25 +48,6 @@
         ['.ct-side, .ct-card, .faq-item', 'up', true]
     ];
 
-    /* títulos: cada palavra sobe de dentro de uma máscara */
-    document.querySelectorAll('.head h2, .pg-head h2, .blog__head h2, .about__text h2, .contact__info h2').forEach(function (h) {
-        var n = 0;
-        (function walk(node) {
-            Array.prototype.slice.call(node.childNodes).forEach(function (c) {
-                if (c.nodeType === 3) {
-                    var parts = c.nodeValue.split(/(\s+)/), frag = document.createDocumentFragment();
-                    parts.forEach(function (p) {
-                        if (!p) return;
-                        if (/^\s+$/.test(p)) { frag.appendChild(document.createTextNode(' ')); return; }
-                        var w = document.createElement('span'), i = document.createElement('span');
-                        w.className = 'w'; i.textContent = p; i.style.setProperty('--i', n++); w.appendChild(i); frag.appendChild(w);
-                    });
-                    c.parentNode.replaceChild(frag, c);
-                } else if (c.nodeType === 1 && !c.classList.contains('w')) walk(c);
-            });
-        })(h);
-    });
-
     var seen = new Set(), items = [];
     RULES.forEach(function (r) {
         if (!r[1]) return;
@@ -83,15 +64,26 @@
         });
     });
 
-    document.querySelectorAll('.w').forEach(function (w) { var h = w.closest('h2'); if (h && !h.classList.contains('rv')) w.classList.add('is-in'); });
-
-    /* passo a passo: linha que se desenha e círculos que surgem em sequência */
+    /* passo a passo: o progresso acompanha a rolagem e cada passo acende quando a linha chega nele */
     var stepsList = document.querySelector('.steps__list');
-    if (stepsList) {
-        stepsList.classList.add('rv-ready');
-        stepsList.querySelectorAll('.step').forEach(function (st, k) { st.style.setProperty('--d', (k * 0.5 + 0.35).toFixed(2) + 's'); });
+    var stepEls = stepsList ? Array.prototype.slice.call(stepsList.querySelectorAll('.step')) : [];
+    if (stepsList) stepsList.classList.add('rv-ready');
+    function liveSteps() {
+        if (!stepsList) return;
+        var rc = stepsList.getBoundingClientRect(), vh = window.innerHeight;
+        var horizontal = getComputedStyle(stepsList, '::after').height === '3px';
+        var span = horizontal ? vh * 0.4 : rc.height * 0.9;
+        var p = Math.max(0, Math.min(1, (vh * 0.78 - rc.top) / span));
+        if (rc.top < -rc.height) p = 1;
+        stepsList.style.setProperty('--p', p.toFixed(3));
+        var last = -1;
+        stepEls.forEach(function (st, i) {
+            var on = p >= (i / (stepEls.length - 1)) - 0.001 && p > 0.02;
+            st.classList.toggle('is-on', on);
+            if (on) last = i;
+        });
+        stepEls.forEach(function (st, i) { st.classList.toggle('is-current', i === last && last < stepEls.length); });
     }
-    function liveSteps() { if (stepsList && !stepsList.classList.contains('is-live')) stepsList.classList.add('is-live'); }
 
     var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
@@ -101,14 +93,13 @@
         });
     }, { threshold: 0.01, rootMargin: '0px 0px -4% 0px' });
     items.forEach(function (el) { io.observe(el); });
-    if (stepsList) new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { liveSteps(); o.disconnect(); } }, { threshold: 0.25 }).observe(stepsList);
 
     /* varredura determinística: tudo que já entrou na tela aparece (cobre o fim da página e itens aninhados) */
     var sweepQueued = false;
     function sweep() {
         sweepQueued = false;
         var vh = window.innerHeight;
-        if (stepsList) { var sr = stepsList.getBoundingClientRect(); if (sr.top < vh * 0.7) liveSteps(); }
+        liveSteps();
         items.forEach(function (el) {
             if (el.classList.contains('rv-in')) return;
             var r = el.getBoundingClientRect();
@@ -128,7 +119,7 @@
             var r = el.getBoundingClientRect();
             if (r.top < window.innerHeight * 1.5) el.classList.add('rv-in');
         });
-        if (stepsList && stepsList.getBoundingClientRect().top < window.innerHeight * 1.2) liveSteps();
+        liveSteps();
     }, 3500);
 
     /* barra de progresso de leitura no topo */
