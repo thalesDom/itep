@@ -268,17 +268,20 @@
         ].filter(function (l, i, a) { return !(l === '' && a[i - 1] === ''); }).join('\n');
 
         /* a mensagem vai para a área restrita (não abre mais o WhatsApp) */
-        var btn = form.querySelector('button[type="submit"]'), btnTxt = btn.querySelector('span'), okBox = document.getElementById('formOk');
+        var btn = form.querySelector('button[type="submit"]'), btnTxt = btn.querySelector('span'), result = document.getElementById('formResult');
         var payload = {
             name: document.getElementById('name').value.trim(), phone: phone.value, email: document.getElementById('email').value.trim(),
             age: age, city: label('city').replace(/\s+-\s+MG$/, ''), course: label('course'), message: msg, source: location.pathname
         };
-        okBox.hidden = true; btn.disabled = true; btnTxt.textContent = 'Enviando…';
+        ITEPFeedback.clear(result); btn.disabled = true; btnTxt.textContent = 'Enviando…';
         fetch('/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), credentials: 'same-origin' })
-            .then(function (r) { if (!r.ok) throw new Error(String(r.status)); form.reset(); okBox.hidden = false; })
+            .then(function (r) {
+                if (!r.ok) throw new Error(String(r.status));
+                form.reset();
+                ITEPFeedback.show(result, { type: 'success', title: 'Mensagem enviada', text: 'Recebemos o seu contato. Em breve a equipe do ITEP fala com você.', actions: [{ label: 'Enviar outra mensagem', onClick: function () { ITEPFeedback.clear(result); document.getElementById('name').focus(); } }] });
+            })
             .catch(function () {
-                errorBox.textContent = 'Não foi possível enviar agora. Tente de novo em instantes ou fale com a gente pelo WhatsApp.';
-                errorBox.hidden = false;
+                ITEPFeedback.show(result, { type: 'error', title: 'Não foi possível enviar agora', text: 'Confira sua conexão e tente de novo. Se preferir, fale direto com a equipe pelo WhatsApp: seus dados continuam preenchidos.', actions: [{ label: 'Tentar novamente', primary: true, onClick: function () { form.requestSubmit(); } }, { label: 'Falar pelo WhatsApp', href: 'https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(text) }] });
             })
             .then(function () { btn.disabled = false; btnTxt.textContent = 'Enviar mensagem'; });
     });

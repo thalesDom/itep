@@ -7,7 +7,6 @@
 
 // Configuração
 const CONFIG = {
-    emailDestino: 'thales.dominguesap94@gmail.com',
     totalSteps: 6,
     get whatsappNumber() { return window.ITEP_WA || '5533998043901'; }
 };
@@ -18,7 +17,7 @@ const formData = {};
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📋 Formulário ITEP carregado!');
+    console.log('Formulário ITEP carregado!');
     initForm();
     setupEventListeners();
     updateProgress();
@@ -274,34 +273,18 @@ function handleSubmit(e) {
 // Envia formulário
 async function sendForm() {
     try {
-        const form = new FormData();
-        
-        // Campos em português usando underscore (sem espaços)
-        form.append('Nome_Completo', formData.nome || 'Não informado');
-        form.append('Email', formData.email || 'Não informado');
-        form.append('Telefone_WhatsApp', formData.telefone || 'Não informado');
-        form.append('Cidade', formData.cidade || 'Não informado');
-        form.append('Curso', formData.curso || 'Não informado');
-        form.append('Data_Envio', new Date().toLocaleString('pt-BR'));
-        
-        // Configurações FormSubmit
-        form.append('_subject', `🎓 ITEP Trilhas do Futuro - Nova Inscrição: ${formData.nome} - ${formData.curso}`);
-        form.append('_template', 'table');
-        form.append('_captcha', 'false');
-        form.append('_cc', formData.email); // Cópia para o candidato
-        
-        const response = await fetch(`https://formsubmit.co/ajax/${CONFIG.emailDestino}`, {
+        const response = await fetch('/api/lead', {
             method: 'POST',
-            body: form,
-            headers: {
-                'Accept': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                name: formData.nome || '', phone: formData.telefone || '', email: formData.email || '',
+                city: formData.cidade || '', course: formData.curso || '', source: location.pathname
+            })
         });
-        
-        const result = await response.json();
-        
+
         if (response.ok) {
-            console.log('✅ Enviado com sucesso!', result);
+            ITEPFeedback.clear(document.getElementById('formFeedback'));
             currentStep = 7;
             updateProgress();
             showStep(currentStep);
@@ -311,22 +294,26 @@ async function sendForm() {
         }
         
     } catch (error) {
-        console.error('❌ Erro:', error);
-        alert('Erro ao enviar. Redirecionando para WhatsApp...');
-        sendToWhatsApp();
-        currentStep = 7;
-        updateProgress();
-        showStep(currentStep);
-        clearForm();
+        console.error('Erro no envio:', error);
+        // não finge que deu certo: avisa e deixa a pessoa tentar de novo ou chamar no WhatsApp
+        ITEPFeedback.show(document.getElementById('formFeedback'), {
+            type: 'error',
+            title: 'Não foi possível enviar agora',
+            text: 'Confira sua conexão e tente de novo. Se preferir, envie seus dados pelo WhatsApp: eles continuam preenchidos.',
+            actions: [
+                { label: 'Tentar novamente', primary: true, onClick: () => { ITEPFeedback.clear(document.getElementById('formFeedback')); document.getElementById('multiStepForm').requestSubmit(); } },
+                { label: 'Enviar pelo WhatsApp', href: whatsappLink() }
+            ]
+        });
     } finally {
         resetSubmitButton();
     }
 }
 
 // WhatsApp backup
-function sendToWhatsApp() {
+function whatsappLink() {
     const message = `
-🎓 INSCRIÇÃO ITEP
+INSCRIÇÃO ITEP
 
 Nome: ${formData.nome}
 Email: ${formData.email}
@@ -335,7 +322,7 @@ Cidade: ${formData.cidade}
 Curso: ${formData.curso}
     `.trim();
     
-    window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    return `https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(message)}`;
 }
 
 // Reseta botão
@@ -353,4 +340,3 @@ function clearForm() {
     Object.keys(formData).forEach(key => delete formData[key]);
 }
 
-console.log('✅ Sistema carregado - Email:', CONFIG.emailDestino);

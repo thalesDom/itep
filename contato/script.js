@@ -1,15 +1,9 @@
 /**
  * ITEP - Página de Contato - JavaScript
- * Envio de email GRATUITO usando FormSubmit.co
- * Email configurado: thales.dominguesap94@gmail.com
+ * Os envios do formulário chegam à área restrita (/api/lead).
  */
 
 'use strict';
-
-// ========================================
-// CONFIGURAÇÃO DO EMAIL
-// ========================================
-const EMAIL_DESTINATION = 'thales.dominguesap94@gmail.com';
 
 // ========================================
 // GERENCIAMENTO DO MENU MOBILE
@@ -102,256 +96,61 @@ function validateForm(formData) {
 function showFormMessage(message, type = 'success') {
     const messageDiv = document.getElementById('formMessage');
     if (!messageDiv) return;
-    
-    messageDiv.textContent = message;
-    messageDiv.className = `form-message ${type}`;
-    
-    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
-    if (type === 'success') {
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 10000);
-    }
+    ITEPFeedback.show(messageDiv, {
+        type: type === 'success' ? 'success' : 'info',
+        title: type === 'success' ? 'Tudo certo' : 'Revise o formulário',
+        text: message
+    });
 }
 
 // ========================================
-// ENVIAR EMAIL COM FORMSUBMIT
+// ENVIO PARA A ÁREA RESTRITA
 // ========================================
-async function sendEmailWithFormSubmit(formData) {
-    const form = new FormData();
-    
-    // Dados do formulário TRADUZIDOS para português
-    form.append('Nome Completo', formData.name);
-    form.append('E-mail', formData.email);
-    form.append('Telefone / WhatsApp', formData.phone);
-    form.append('Cidade de Interesse', formData.city);
-    form.append('Curso de Interesse', formData.course || 'Não especificado');
-    form.append('Assunto', formData.subject);
-    form.append('Mensagem', formData.message);
-    
-    // Adiciona informações extras
-    const dataAtual = new Date().toLocaleString('pt-BR', {
-        dateStyle: 'long',
-        timeStyle: 'short'
-    });
-    form.append('Data e Hora do Envio', dataAtual);
-    form.append('Origem', 'Site ITEP - Página de Contato');
-    
-    // Configurações do FormSubmit com TRADUÇÃO COMPLETA
-    form.append('_subject', `🎓 ITEP Trilhas do Futuro - Novo Contato: ${formData.subject}`);
-    form.append('_captcha', 'false');
-    form.append('_template', 'table');
-    form.append('_cc', formData.email); // Envia cópia para o remetente
-    form.append('_language', 'pt'); // ✅ TRADUZ AS MENSAGENS DO FORMSUBMIT PARA PORTUGUÊS
-    
-    // Personalizações do email
-    form.append('_replyto', formData.email); // Responder direto para o remetente
-    form.append('_autoresponse', `Olá ${formData.name.split(' ')[0]}!
-
-Recebemos sua mensagem através do site do ITEP - Trilhas do Futuro!
-
-📋 Resumo da sua solicitação:
-• Assunto: ${formData.subject}
-• Cidade: ${formData.city}
-• Curso: ${formData.course || 'Não especificado'}
-
-Nossa equipe analisará sua mensagem e retornará em breve.
-
-Atenciosamente,
-Equipe ITEP - Instituto Técnico Educacional Polivalente
-Trilhas do Futuro
-
-📱 WhatsApp: (33) 9 9804-3901
-📧 Email: contato@itep.edu.br
-🌐 www.itep.edu.br`);
-    
-    const response = await fetch(`https://formsubmit.co/ajax/${EMAIL_DESTINATION}`, {
+async function sendLead(formData) {
+    const sel = document.getElementById('city');
+    const csel = document.getElementById('course');
+    const label = (s) => (s && s.selectedIndex > 0 ? s.options[s.selectedIndex].text.replace(/\s+-\s+MG$/, '') : '');
+    const response = await fetch('/api/lead', {
         method: 'POST',
-        body: form,
-        headers: {
-            'Accept': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+            name: formData.name, email: formData.email, phone: formData.phone,
+            city: label(sel), course: label(csel),
+            subject: formData.subject, message: formData.message, source: location.pathname
+        })
     });
-    
-    if (!response.ok) {
-        throw new Error('Erro ao enviar email');
-    }
-    
-    return response.json();
+    if (!response.ok) throw new Error('Falha ao enviar (' + response.status + ')');
 }
-
-// ========================================
-// ALTERNATIVA: ENVIAR COM TEMPLATE HTML PERSONALIZADO
-// ========================================
-async function sendEmailWithCustomTemplate(formData) {
-    // Cria um email HTML bonito e personalizado
-    const emailHTML = `
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #1B5E20, #4CAF50); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-        .header h1 { margin: 0; font-size: 28px; }
-        .header p { margin: 10px 0 0 0; opacity: 0.9; }
-        .content { background: #fff; padding: 30px; border: 1px solid #ddd; }
-        .info-box { background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0; }
-        .info-row { display: flex; margin: 15px 0; }
-        .info-label { font-weight: bold; color: #1B5E20; min-width: 180px; }
-        .info-value { color: #666; }
-        .message-box { background: #e8f5e9; padding: 20px; border-left: 4px solid #4CAF50; margin: 20px 0; border-radius: 4px; }
-        .footer { background: #f5f5f5; padding: 20px; text-align: center; font-size: 14px; color: #666; border-radius: 0 0 10px 10px; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>🎓 ITEP - Trilhas do Futuro</h1>
-            <p>Novo Contato Recebido</p>
-        </div>
-        
-        <div class="content">
-            <h2 style="color: #1B5E20; margin-top: 0;">Informações do Contato</h2>
-            
-            <div class="info-box">
-                <div class="info-row">
-                    <span class="info-label">👤 Nome Completo:</span>
-                    <span class="info-value">${formData.name}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">📧 E-mail:</span>
-                    <span class="info-value">${formData.email}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">📱 Telefone/WhatsApp:</span>
-                    <span class="info-value">${formData.phone}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">📍 Cidade de Interesse:</span>
-                    <span class="info-value">${formData.city}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">📚 Curso de Interesse:</span>
-                    <span class="info-value">${formData.course || 'Não especificado'}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">📋 Assunto:</span>
-                    <span class="info-value">${formData.subject}</span>
-                </div>
-            </div>
-            
-            <h3 style="color: #1B5E20;">💬 Mensagem:</h3>
-            <div class="message-box">
-                ${formData.message.replace(/\n/g, '<br>')}
-            </div>
-            
-            <p style="color: #999; font-size: 14px; margin-top: 30px;">
-                📅 Enviado em: ${new Date().toLocaleString('pt-BR', { dateStyle: 'long', timeStyle: 'short' })}<br>
-                🌐 Origem: Site ITEP - Página de Contato
-            </p>
-        </div>
-        
-        <div class="footer">
-            <p><strong>ITEP - Instituto Técnico Educacional Polivalente</strong></p>
-            <p>Trilhas do Futuro</p>
-            <p>📱 (33) 9 9804-3901 | 📧 contato@itep.edu.br</p>
-        </div>
-    </div>
-</body>
-</html>
-    `;
-    
-    const form = new FormData();
-    
-    // Envia o HTML customizado
-    form.append('_html', emailHTML);
-    
-    // Configurações com tradução
-    form.append('_subject', `🎓 ITEP - Novo Contato: ${formData.subject}`);
-    form.append('_captcha', 'false');
-    form.append('_cc', formData.email);
-    form.append('_replyto', formData.email);
-    form.append('_language', 'pt'); // ✅ TRADUÇÃO
-    
-    // Resposta automática para o cliente
-    form.append('_autoresponse', `Olá ${formData.name.split(' ')[0]}!
-
-✅ Recebemos sua mensagem com sucesso!
-
-Sua solicitação foi registrada e nossa equipe do ITEP entrará em contato em breve.
-
-📋 Resumo do seu contato:
-• Assunto: ${formData.subject}
-• Cidade: ${formData.city}
-• Curso: ${formData.course || 'Não especificado'}
-
-Enquanto isso, você pode:
-📱 Nos chamar no WhatsApp: (33) 9 9804-3901
-🌐 Acessar nosso site: www.itep.edu.br
-📘 Conhecer nossos cursos: www.itep.edu.br/cursos
-
-Atenciosamente,
-Equipe ITEP - Trilhas do Futuro
-Instituto Técnico Educacional Polivalente
-
-"Transformando vidas através da educação"
-`);
-    
-    const response = await fetch(`https://formsubmit.co/ajax/${EMAIL_DESTINATION}`, {
-        method: 'POST',
-        body: form,
-        headers: {
-            'Accept': 'application/json'
-        }
-    });
-    
-    if (!response.ok) {
-        throw new Error('Erro ao enviar email');
-    }
-    
-    return response.json();
-}
-
-// ========================================
-// ESCOLHER QUAL MÉTODO USAR
-// ========================================
-// Descomente as linhas abaixo para usar o template HTML personalizado
-// async function sendEmailWithFormSubmit(formData) {
-//     return await sendEmailWithCustomTemplate(formData);
-// }
 
 function sendToWhatsApp(formData) {
     const whatsappNumber = (window.ITEP_WA || '5533998043901');
     
     const message = `
-🎓 *CONTATO SITE ITEP*
+*CONTATO SITE ITEP*
 
-👤 *Dados do Interessado:*
+*Dados do Interessado:*
 • Nome: ${formData.name}
 • E-mail: ${formData.email}
 • Telefone: ${formData.phone}
 
-📍 *Localização:*
+*Localização:*
 • Cidade: ${formData.city}
 
-📚 *Curso de Interesse:*
+*Curso de Interesse:*
 ${formData.course ? `• ${formData.course}` : '• Não especificado'}
 
-📋 *Assunto:*
+*Assunto:*
 ${formData.subject}
 
-💬 *Mensagem:*
+*Mensagem:*
 ${formData.message}
 
 ---
-✅ Enviado através do formulário de contato
+Enviado através do formulário de contato
     `.trim();
     
-    const whatsappURL = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappURL, '_blank');
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 }
 
 // ========================================
@@ -385,45 +184,35 @@ if (contactForm) {
         // Desabilita botão
         const submitBtn = contactForm.querySelector('.btn-submit');
         const originalBtnText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando email...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
         submitBtn.disabled = true;
         
         try {
-            // Envia email via FormSubmit
-            const response = await sendEmailWithFormSubmit(formData);
-            
-            console.log('✅ Email enviado com sucesso:', response);
-            
-            // Sucesso!
-            showFormMessage(
-                '✅ Mensagem enviada com sucesso! Você receberá uma confirmação no seu email e entraremos em contato em breve.',
-                'success'
-            );
-            
-            // Limpa formulário
+            // Envia para a área restrita
+            await sendLead(formData);
+
             contactForm.reset();
-            
-            // Oferece WhatsApp como opção adicional
-            setTimeout(() => {
-                if (confirm('✅ Email enviado! Deseja também enviar uma cópia via WhatsApp para resposta mais rápida?')) {
-                    sendToWhatsApp(formData);
-                }
-            }, 2000);
-            
+            ITEPFeedback.show(document.getElementById('formMessage'), {
+                type: 'success',
+                title: 'Mensagem enviada',
+                text: 'Recebemos o seu contato. Em breve a equipe do ITEP fala com você.',
+                actions: [
+                    { label: 'Enviar outra mensagem', primary: true, onClick: () => { ITEPFeedback.clear(document.getElementById('formMessage')); document.getElementById('name').focus(); } }
+                ]
+            });
+
         } catch (error) {
-            console.error('❌ Erro ao enviar email:', error);
-            
-            // Em caso de erro, usa WhatsApp
-            showFormMessage(
-                '⚠️ Não foi possível enviar o email neste momento. Vamos redirecioná-lo para o WhatsApp...', 
-                'error'
-            );
-            
-            setTimeout(() => {
-                sendToWhatsApp(formData);
-                contactForm.reset();
-            }, 2000);
-            
+            console.error('Erro ao enviar e-mail:', error);
+            ITEPFeedback.show(document.getElementById('formMessage'), {
+                type: 'error',
+                title: 'Não foi possível enviar agora',
+                text: 'Confira sua conexão e tente de novo. Se preferir, fale direto com a equipe pelo WhatsApp: seus dados continuam preenchidos.',
+                actions: [
+                    { label: 'Tentar novamente', primary: true, onClick: () => contactForm.requestSubmit() },
+                    { label: 'Falar pelo WhatsApp', href: sendToWhatsApp(formData) }
+                ]
+            });
+
         } finally {
             // Restaura botão
             setTimeout(() => {
@@ -561,41 +350,8 @@ window.addEventListener('scroll', () => {
 // ========================================
 // VERIFICAÇÃO DE CONFIRMAÇÃO DO FORMSUBMIT
 // ========================================
-// IMPORTANTE: Na primeira vez que usar, você receberá um email
-// de confirmação do FormSubmit. Clique no link para ativar!
 
-window.addEventListener('DOMContentLoaded', () => {
-    console.log(`
-🎓 ITEP - Sistema de Contato Ativado
-=====================================
-✅ JavaScript carregado com sucesso
-📧 Email destino: ${EMAIL_DESTINATION}
-📱 WhatsApp backup: (33) 9 9804-3901
-🌍 Idioma: Português (pt-BR)
 
-⚠️  IMPORTANTE - PRIMEIRA VEZ:
-   1. Ao enviar o primeiro email, você receberá
-      uma mensagem de confirmação do FormSubmit
-      no email: ${EMAIL_DESTINATION}
-   
-   2. Abra o email e clique no link de confirmação
-   
-   3. Após confirmar, todos os formulários futuros
-      serão enviados automaticamente!
-
-📝 RECURSOS ATIVOS:
-   ✓ Envio de email gratuito (FormSubmit)
-   ✓ Mensagens em PORTUGUÊS (_language: 'pt')
-   ✓ Cópia automática para o remetente
-   ✓ Validação completa do formulário
-   ✓ WhatsApp como backup
-   ✓ Formatação automática de telefone
-   ✓ Animações suaves
-   ✓ Menu responsivo
-
-🚀 Tudo pronto para receber contatos!
-    `);
-});
 
 // ========================================
 // PREVENÇÃO DE SPAM
@@ -607,10 +363,10 @@ contactForm?.addEventListener('submit', (e) => {
     const now = Date.now();
     if (now - lastSubmitTime < SUBMIT_COOLDOWN) {
         e.preventDefault();
-        showFormMessage('⏳ Por favor, aguarde alguns segundos antes de enviar novamente.', 'error');
+        showFormMessage('Por favor, aguarde alguns segundos antes de enviar novamente.', 'error');
         return false;
     }
     lastSubmitTime = now;
 }, true);
 
-console.log('✅ Página de contato carregada e pronta!');
+console.log('Página de contato carregada e pronta!');

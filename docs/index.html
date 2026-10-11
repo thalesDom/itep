@@ -215,7 +215,7 @@
         <!-- Diferenciais -->
         <section class="trust">
             <div class="wrap trust__grid">
-                <div class="trust__item"><i data-lucide="book-open-check"></i><div><strong>22 cursos técnicos</strong><span>Em 4 áreas de formação</span></div></div>
+                <div class="trust__item"><i data-lucide="book-open-check"></i><div><strong>22 cursos técnicos</strong><span>Disponíveis para você</span></div></div>
                 <div class="trust__item"><i data-lucide="map-pin"></i><div><strong>13 municípios</strong><span>Presença em Minas Gerais</span></div></div>
                 <div class="trust__item"><i data-lucide="badge-dollar-sign"></i><div><strong>Cursos gratuitos</strong><span>Conforme a relação informada</span></div></div>
                 <div class="trust__item"><i data-lucide="award"></i><div><strong>Há 20 anos</strong><span>Transformando vidas</span></div></div>
@@ -716,7 +716,7 @@
                             <i data-lucide="send"></i>
                             <span>Enviar mensagem</span>
                         </button>
-                        <p class="form-ok" id="formOk" role="status" hidden><i data-lucide="circle-check"></i> Mensagem enviada! Em breve a equipe do ITEP entra em contato.</p>
+                        <div id="formResult" aria-live="polite"></div>
                     </form>
                 </div>
             </div>
@@ -783,8 +783,10 @@
     </a>
 
     <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+    <script src="/itep/feedback.js"></script>
     <script src="script.js"></script>
     <script src="/itep/cookies.js" defer></script>
+    <script src="/itep/contact-links.js?v=20" defer></script>
     <script src="/itep/totop.js" defer></script>
     <script src="/itep/reveal.js?v=20" defer></script>
 </body>

@@ -921,3 +921,6 @@ section, footer { overflow-x: hidden; overflow-x: clip; }
 .form-ok { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding: 14px 16px; font-weight: 600; color: var(--verde-900); background: var(--verde-100); border-radius: 14px; }
 .form-ok[hidden] { display: none; }
 .form-ok [data-lucide] { flex: none; color: var(--verde-700); }
+
+/* redes sociais sem endereço cadastrado não aparecem (aparecem sozinhas quando o link é salvo no painel) */
+a[href="#"][aria-label="Facebook"], a[href="#"][aria-label="Instagram"] { display: none !important; }

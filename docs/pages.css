@@ -324,3 +324,4 @@ body { overflow-x: hidden; overflow-x: clip; max-width: 100%; }
 /* títulos das páginas internas: menores e mais refinados */
 .pg-hero h1 { font-size: clamp(2rem, 4.6vw, 3.25rem); max-width: 20ch; }
 
+a[href="#"][aria-label="Facebook"], a[href="#"][aria-label="Instagram"] { display: none !important; }
