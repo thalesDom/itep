@@ -323,3 +323,6 @@ body { overflow-x: hidden; overflow-x: clip; max-width: 100%; }
 
 /* títulos das páginas internas: menores e mais refinados */
 .pg-hero h1 { font-size: clamp(2rem, 4.6vw, 3.25rem); max-width: 20ch; }
+
+/* títulos animados também nas páginas internas */
+.eyebrow:not(:has([data-lucide]))::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 9px; vertical-align: 1px; border-radius: 50%; background: var(--verde-600); animation: eb-ping 2.2s ease-out infinite; }

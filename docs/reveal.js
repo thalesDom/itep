@@ -48,6 +48,25 @@
         ['.ct-side, .ct-card, .faq-item', 'up', true]
     ];
 
+    /* títulos: cada palavra sobe de dentro de uma máscara */
+    document.querySelectorAll('.head h2, .pg-head h2, .blog__head h2, .about__text h2, .contact__info h2').forEach(function (h) {
+        var n = 0;
+        (function walk(node) {
+            Array.prototype.slice.call(node.childNodes).forEach(function (c) {
+                if (c.nodeType === 3) {
+                    var parts = c.nodeValue.split(/(s+)/), frag = document.createDocumentFragment();
+                    parts.forEach(function (p) {
+                        if (!p) return;
+                        if (/^s+$/.test(p)) { frag.appendChild(document.createTextNode(' ')); return; }
+                        var w = document.createElement('span'), i = document.createElement('span');
+                        w.className = 'w'; i.textContent = p; i.style.setProperty('--i', n++); w.appendChild(i); frag.appendChild(w);
+                    });
+                    c.parentNode.replaceChild(frag, c);
+                } else if (c.nodeType === 1 && !c.classList.contains('w')) walk(c);
+            });
+        })(h);
+    });
+
     var seen = new Set(), items = [];
     RULES.forEach(function (r) {
         if (!r[1]) return;
@@ -64,6 +83,16 @@
         });
     });
 
+    document.querySelectorAll('.w').forEach(function (w) { var h = w.closest('h2'); if (h && !h.classList.contains('rv')) w.classList.add('is-in'); });
+
+    /* passo a passo: linha que se desenha e círculos que surgem em sequência */
+    var stepsList = document.querySelector('.steps__list');
+    if (stepsList) {
+        stepsList.classList.add('rv-ready');
+        stepsList.querySelectorAll('.step').forEach(function (st, k) { st.style.setProperty('--d', (k * 0.5 + 0.35).toFixed(2) + 's'); });
+    }
+    function liveSteps() { if (stepsList && !stepsList.classList.contains('is-live')) stepsList.classList.add('is-live'); }
+
     var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (e) {
             if (!e.isIntersecting) return;
@@ -72,12 +101,14 @@
         });
     }, { threshold: 0.01, rootMargin: '0px 0px -4% 0px' });
     items.forEach(function (el) { io.observe(el); });
+    if (stepsList) new IntersectionObserver(function (es, o) { if (es[0].isIntersecting) { liveSteps(); o.disconnect(); } }, { threshold: 0.25 }).observe(stepsList);
 
     /* varredura determinística: tudo que já entrou na tela aparece (cobre o fim da página e itens aninhados) */
     var sweepQueued = false;
     function sweep() {
         sweepQueued = false;
         var vh = window.innerHeight;
+        if (stepsList) { var sr = stepsList.getBoundingClientRect(); if (sr.top < vh * 0.7) liveSteps(); }
         items.forEach(function (el) {
             if (el.classList.contains('rv-in')) return;
             var r = el.getBoundingClientRect();
@@ -97,6 +128,7 @@
             var r = el.getBoundingClientRect();
             if (r.top < window.innerHeight * 1.5) el.classList.add('rv-in');
         });
+        if (stepsList && stepsList.getBoundingClientRect().top < window.innerHeight * 1.2) liveSteps();
     }, 3500);
 
     /* barra de progresso de leitura no topo */
