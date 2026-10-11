@@ -3,7 +3,7 @@
 (function () {
     'use strict';
 
-    var OLD = { wa: '5533998043901', label: '(33) 9 9804-3901', mail: 'contato@itep.edu.br', hours: 'Seg a sex, 8h às 18h' };
+    var OLD = { wa: '5533998043901', label: '(33) 9 9804-3901', mail: 'diretoriaitep@itepminasgerais.com.br', hours: 'Seg a sex, 8h às 18h' };
     var SITE = null;
 
     function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }

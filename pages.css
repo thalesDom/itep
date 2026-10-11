@@ -325,3 +325,8 @@ body { overflow-x: hidden; overflow-x: clip; max-width: 100%; }
 .pg-hero h1 { font-size: clamp(2rem, 4.6vw, 3.25rem); max-width: 20ch; }
 
 a[href="#"][aria-label="Facebook"], a[href="#"][aria-label="Instagram"] { display: none !important; }
+
+/* e-mail da diretoria é longo: quebra em vez de empurrar a página */
+a[href^="mailto:"] { overflow-wrap: anywhere; }
+.fact, .fact > div, .defs li, .defs li > *, .ccard, .ccard > * { min-width: 0; max-width: 100%; }
+.fact strong, .defs a { overflow-wrap: anywhere; }

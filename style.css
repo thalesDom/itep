@@ -935,3 +935,11 @@ a[href="#"][aria-label="Facebook"], a[href="#"][aria-label="Instagram"] { displa
 @keyframes wa-wiggle { 0%, 86%, 100% { transform: none; } 88% { transform: rotate(-14deg) scale(1.1); } 90% { transform: rotate(12deg) scale(1.1); } 92% { transform: rotate(-9deg) scale(1.05); } 94% { transform: rotate(6deg); } 96% { transform: rotate(-3deg); } }
 @keyframes wa-in { from { opacity: 0; transform: scale(.3) translateY(24px); } }
 @media (prefers-reduced-motion: reduce) { .wa-float, .wa-float::before, .wa-float::after, .wa-float .ico { animation: none; } }
+
+/* e-mail da diretoria é longo: quebra em vez de empurrar a página */
+a[href^="mailto:"], .topbar__mail { overflow-wrap: anywhere; }
+.contact__list li, .contact__list a, .contact__info, .contact__form, .footer__col, .footer__col a, .menu__contact a { min-width: 0; max-width: 100%; }
+@media (max-width: 479px) { .topbar__mail { font-size: .8125rem; } }
+.footer__col a[href^="mailto:"] { font-size: .875rem; overflow-wrap: break-word; word-break: normal; }
+@media (max-width: 380px) { .footer__col a[href^="mailto:"] { font-size: .8125rem; } }
+@media (min-width: 900px) { .footer__top { grid-template-columns: 1.3fr .9fr .9fr 1.45fr; } }
