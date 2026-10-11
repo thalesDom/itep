@@ -7,7 +7,6 @@
     function opt(form, sel) { var e = form.querySelector(sel); if (!e) return ''; if (e.tagName === 'SELECT') { var o = e.options[e.selectedIndex]; return o && o.value ? o.text.replace(/\s+-\s+MG$/, '') : ''; } return e.value; }
 
     var READERS = {
-        'contact-form': function (f) { return { name: val(f, '#name'), phone: val(f, '#phone'), email: val(f, '#email'), age: val(f, '#age'), city: opt(f, '#city'), course: opt(f, '#course'), message: val(f, '#message') }; },
         'contactForm': function (f) { return { name: val(f, '#name'), phone: val(f, '#phone'), email: val(f, '#email'), city: opt(f, '#city'), course: opt(f, '#course'), subject: val(f, '#subject'), message: val(f, '#message') }; },
         'multiStepForm': function (f) { return { name: val(f, '#nome'), phone: val(f, '#telefone'), email: val(f, '#email'), city: opt(f, '#cidade'), course: opt(f, '#curso') }; }
     };

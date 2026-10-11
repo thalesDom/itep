@@ -267,8 +267,20 @@
             'Enviado pelo site do ITEP'
         ].filter(function (l, i, a) { return !(l === '' && a[i - 1] === ''); }).join('\n');
 
-        window.open('https://wa.me/' + waNumber() + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
-        form.reset();
+        /* a mensagem vai para a área restrita (não abre mais o WhatsApp) */
+        var btn = form.querySelector('button[type="submit"]'), btnTxt = btn.querySelector('span'), okBox = document.getElementById('formOk');
+        var payload = {
+            name: document.getElementById('name').value.trim(), phone: phone.value, email: document.getElementById('email').value.trim(),
+            age: age, city: label('city').replace(/\s+-\s+MG$/, ''), course: label('course'), message: msg, source: location.pathname
+        };
+        okBox.hidden = true; btn.disabled = true; btnTxt.textContent = 'Enviando…';
+        fetch('/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload), credentials: 'same-origin' })
+            .then(function (r) { if (!r.ok) throw new Error(String(r.status)); form.reset(); okBox.hidden = false; })
+            .catch(function () {
+                errorBox.textContent = 'Não foi possível enviar agora. Tente de novo em instantes ou fale com a gente pelo WhatsApp.';
+                errorBox.hidden = false;
+            })
+            .then(function () { btn.disabled = false; btnTxt.textContent = 'Enviar mensagem'; });
     });
 
     /* acordeão dos grupos de cursos no menu do celular */

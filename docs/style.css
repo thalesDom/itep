@@ -916,3 +916,8 @@ section, footer { overflow-x: hidden; overflow-x: clip; }
     .steps__list::after { left: 28px; right: 28px; top: 26px; bottom: auto; width: auto; height: 3px; transform: scaleX(var(--p, 0)); transform-origin: left; }
 }
 @media (min-width: 700px) and (max-width: 899px) { .steps__list::after { display: none; } }
+
+/* formulário de contato da home: confirmação de envio */
+.form-ok { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding: 14px 16px; font-weight: 600; color: var(--verde-900); background: var(--verde-100); border-radius: 14px; }
+.form-ok[hidden] { display: none; }
+.form-ok [data-lucide] { flex: none; color: var(--verde-700); }
