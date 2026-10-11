@@ -54,10 +54,10 @@
         (function walk(node) {
             Array.prototype.slice.call(node.childNodes).forEach(function (c) {
                 if (c.nodeType === 3) {
-                    var parts = c.nodeValue.split(/(s+)/), frag = document.createDocumentFragment();
+                    var parts = c.nodeValue.split(/(\s+)/), frag = document.createDocumentFragment();
                     parts.forEach(function (p) {
                         if (!p) return;
-                        if (/^s+$/.test(p)) { frag.appendChild(document.createTextNode(' ')); return; }
+                        if (/^\s+$/.test(p)) { frag.appendChild(document.createTextNode(' ')); return; }
                         var w = document.createElement('span'), i = document.createElement('span');
                         w.className = 'w'; i.textContent = p; i.style.setProperty('--i', n++); w.appendChild(i); frag.appendChild(w);
                     });
