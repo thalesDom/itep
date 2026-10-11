@@ -21,6 +21,22 @@ try {
     /* ===== público ===== */
     if ($route === '/site' && $method === 'GET') out(200, site_payload(true), ['Cache-Control' => 'public, max-age=20']);
 
+    /* sitemap dos artigos do blog (inclui os criados no painel); o sitemap.xml das páginas fixas é um arquivo estático */
+    if ($route === '/sitemap-blog.xml' && $method === 'GET') {
+        $base = rtrim((string) (cfg()['site_url'] ?? 'https://itepminasgerais.com.br'), '/');
+        $rows = $pdo->query('SELECT slug, updated_at FROM posts WHERE published = 1 ORDER BY sort, updated_at DESC')->fetchAll();
+        header('Content-Type: application/xml; charset=utf-8');
+        header('Cache-Control: public, max-age=3600');
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        echo '  <url><loc>' . htmlspecialchars($base . '/blog/', ENT_XML1) . '</loc></url>' . "\n";
+        foreach ($rows as $r) {
+            $ts = strtotime(((string) $r['updated_at']) . ' UTC');
+            echo '  <url><loc>' . htmlspecialchars($base . '/blog/' . rawurlencode((string) $r['slug']) . '/', ENT_XML1) . '</loc>' . ($ts ? '<lastmod>' . gmdate('Y-m-d', $ts) . '</lastmod>' : '') . '</url>' . "\n";
+        }
+        echo '</urlset>' . "\n";
+        exit;
+    }
+
     if ($route === '/lead' && $method === 'POST') {
         $b = body(20000);
         if (!empty($b['website'])) out(200, ['ok' => true]); // armadilha anti-robô

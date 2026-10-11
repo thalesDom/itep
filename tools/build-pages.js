@@ -13,7 +13,7 @@ const OUT = path.join(ROOT, 'docs');
 const PREFIX = '/' + path.basename(String(process.argv[2] || 'itep').replace(/[\\/]+$/, ''));
 if (!/^\/[A-Za-z0-9._-]+$/.test(PREFIX)) { console.error('Prefixo inválido: ' + PREFIX); process.exit(1); }
 const SKIP_DIRS = new Set(['docs', 'tools', 'api', 'admin', 'instalar', 'uploads', 'prints', '.git', 'node_modules']);
-const SKIP_FILES = /(^\.|\.php$|\.md$|\.bat$|\.sql$|\.lock$|^seed\.json$|^site-data\.js$|^lead-beacon\.js$)/;
+const SKIP_FILES = /(^\.|\.php$|\.md$|\.bat$|\.sql$|\.lock$|^seed\.json$|^site-data\.js$|^lead-beacon\.js$|^sitemap.*\.xml$|^robots\.txt$)/;
 const SKIP_PAGES = new Set(['blog/artigo']); // modelo que depende da API
 
 function rmrf(p) { fs.rmSync(p, { recursive: true, force: true }); }

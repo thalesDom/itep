@@ -167,11 +167,30 @@
                 var s = el('section', 'pg-section'); var w = el('div', 'wrap'); w.style.textAlign = 'center';
                 w.appendChild(el('h1', null, 'Artigo indisponível')); var pp = el('p', null, 'Este artigo não está mais publicado.'); pp.style.margin = '16px 0 24px'; w.appendChild(pp);
                 var a = el('a', 'btn btn--green btn--lg', 'Ver todos os artigos'); a.href = '/blog/index.html'; w.appendChild(a); s.appendChild(w); main.appendChild(s);
-                document.title = 'Artigo indisponível | ITEP';
+                document.title = 'Artigo indisponível | ITEP'; var nr = document.createElement('meta'); nr.name = 'robots'; nr.content = 'noindex'; document.head.appendChild(nr);
             }
             return;
         }
         document.title = p.title + ' | Blog ITEP';
+        /* SEO do artigo (o modelo é um só; título, descrição, canônico e dados estruturados vêm do banco) */
+        (function () {
+            var base = 'https://itepminasgerais.com.br', url = base + '/blog/' + encodeURIComponent(p.slug || slug) + '/';
+            var d = String((p.text && p.text[0]) || p.title).replace(/\s+/g, ' ').trim(); if (d.length > 155) d = d.slice(0, 152).replace(/\s+\S*$/, '') + '...';
+            var img = /^https?:\/\//i.test(p.img || '') ? p.img : (p.img ? base + p.img : base + '/img/og-itep.jpg');
+            function put(tag, key, val, content) {
+                var e = document.head.querySelector(tag + '[' + key + '="' + val + '"]');
+                if (!e) { e = document.createElement(tag); e.setAttribute(key, val); document.head.appendChild(e); }
+                e.setAttribute(tag === 'link' ? 'href' : 'content', content);
+            }
+            put('meta', 'name', 'description', d);
+            put('link', 'rel', 'canonical', url);
+            put('meta', 'property', 'og:type', 'article'); put('meta', 'property', 'og:title', p.title + ' | Blog ITEP'); put('meta', 'property', 'og:description', d);
+            put('meta', 'property', 'og:url', url); put('meta', 'property', 'og:image', img);
+            put('meta', 'name', 'twitter:title', p.title + ' | Blog ITEP'); put('meta', 'name', 'twitter:description', d); put('meta', 'name', 'twitter:image', img);
+            var ld = document.getElementById('seo-ld') || document.head.appendChild(document.createElement('script')); ld.id = 'seo-ld'; ld.type = 'application/ld+json';
+            var org = { '@type': 'EducationalOrganization', name: 'ITEP – Instituto Técnico Educacional Polivalente', url: base + '/' };
+            ld.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'BlogPosting', headline: p.title, description: d, image: img, url: url, mainEntityOfPage: url, inLanguage: 'pt-BR', author: org, publisher: org });
+        })();
         var h1 = document.querySelector('.pg-hero h1'); if (h1) h1.textContent = p.title;
         var tag = document.querySelector('.pg-hero .pg-tag'); if (tag) { tag.textContent = ''; tag.appendChild(icon('newspaper')); tag.appendChild(document.createTextNode(' ' + p.cat)); }
         var cur = document.querySelector('.crumbs [aria-current]'); if (cur) cur.textContent = p.cat;

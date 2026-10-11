@@ -24,6 +24,9 @@ if ($path === '/admin' || strpos($path, '/admin/') === 0) {
     return true;
 }
 
+// sitemap dos artigos (gerado pelo banco)
+if ($path === '/sitemap-blog.xml') { require __DIR__ . '/api/index.php'; return true; }
+
 // API
 if (strpos($path, '/api/') === 0 && $path !== '/api/index.php') { require __DIR__ . '/api/index.php'; return true; }
 

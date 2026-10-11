@@ -41,3 +41,18 @@ Faça backup do banco MySQL e da pasta `uploads/`. Esses dois guardam tudo que f
 
 ## Limites desta versão
 Cidades e cursos **existentes** podem ser editados, mas criar uma cidade ou um curso novo ainda exige criar a página (HTML) correspondente.
+
+## SEO (Google) — domínio https://itepminasgerais.com.br
+
+O site já sai pronto: título e descrição únicos por página, link canônico, Open Graph/Twitter (prévia ao compartilhar), dados estruturados (organização, cursos, unidades, artigos), robots.txt e sitemaps.
+
+- Para regerar depois de mudar páginas: node tools/gen-seo.js (sitemap.xml, robots.txt e o bloco de SEO de cada página).
+- sitemap-blog.xml é gerado pelo banco e inclui os artigos criados no painel.
+- O .htaccess redireciona para HTTPS e ativa compressão e cache.
+
+Depois de publicar na hospedagem:
+1. Google Search Console (search.google.com/search-console): adicione o domínio, confirme a propriedade e envie sitemap.xml e sitemap-blog.xml.
+2. Peça a indexação da página inicial (Inspeção de URL > Solicitar indexação).
+3. Crie/reivindique o perfil do ITEP no Google Meu Negócio (uma ficha por unidade, se houver endereço).
+4. Confirme que o site abre só com HTTPS e que a versão www redireciona para a sem www (ou o contrário), em um endereço só.
+5. Resultado nas primeiras posições leva semanas ou meses e depende de concorrência, conteúdo e links vindos de outros sites.

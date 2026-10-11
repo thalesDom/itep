@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /instalar/
+Disallow: /blog/artigo/
+
+Sitemap: https://itepminasgerais.com.br/sitemap.xml
+Sitemap: https://itepminasgerais.com.br/sitemap-blog.xml
