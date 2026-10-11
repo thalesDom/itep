@@ -1,6 +1,7 @@
-/* ITEP — links de e-mail que funcionam em qualquer computador.
-   Quem não tem aplicativo de e-mail configurado clica em "contato@..." e nada acontece; aqui o clique abre uma janela
-   com três opções: abrir no Gmail, usar o aplicativo de e-mail ou copiar o endereço. */
+/* ITEP — links de e-mail e de telefone que funcionam em qualquer computador.
+   E-mail: quem não tem aplicativo de e-mail configurado clica e nada acontece; aqui abre uma janela com
+   "Abrir no Gmail", "Usar o aplicativo de e-mail" e "Copiar endereço".
+   Telefone: abre uma janela com "Chamar no WhatsApp", "Ligar" e "Copiar número". */
 (function () {
     'use strict';
 
@@ -33,12 +34,15 @@
     style.textContent = css;
     document.head.appendChild(style);
 
+    var P = 'fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
     var SVG = {
-        mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>',
+        mail: '<svg viewBox="0 0 24 24" ' + P + '><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>',
         x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
-        copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
-        ext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
-        check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>'
+        copy: '<svg viewBox="0 0 24 24" ' + P + '><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+        ext: '<svg viewBox="0 0 24 24" ' + P + '><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
+        check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+        phone: '<svg viewBox="0 0 24 24" ' + P + '><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+        chat: '<svg viewBox="0 0 24 24" ' + P + '><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>'
     };
 
     function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
@@ -52,25 +56,30 @@
         });
     }
 
-    function openMail(addr, subject) {
+    /* janela genérica: cfg = { icon, title, highlight, hint, copy: { text, label, done }, actions: [{ label, icon, href, blank, native, primary }] } */
+    function openDialog(cfg) {
         var prev = document.activeElement;
         var back = el('div', 'cl-back');
         var card = el('div', 'cl-card');
         card.setAttribute('role', 'dialog'); card.setAttribute('aria-modal', 'true'); card.setAttribute('aria-labelledby', 'clTitle');
-        var title = el('h2'); title.id = 'clTitle'; title.textContent = 'Enviar e-mail';
-        var mail = el('p', 'cl-mail'); mail.textContent = addr;
-        var hint = el('p', 'cl-hint'); hint.textContent = 'Escolha como prefere escrever para o ITEP.';
-        var gmail = el('a', 'cl-btn cl-btn--primary', SVG.ext + '<span>Abrir no Gmail</span>');
-        gmail.href = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(addr) + (subject ? '&su=' + encodeURIComponent(subject) : '');
-        gmail.target = '_blank'; gmail.rel = 'noopener';
-        var app = el('a', 'cl-btn cl-btn--line', SVG.mail + '<span>Usar o aplicativo de e-mail</span>');
-        app.href = 'mailto:' + addr + (subject ? '?subject=' + encodeURIComponent(subject) : '');
-        app.setAttribute('data-native', '');
-        var copy = el('button', 'cl-btn cl-btn--line', SVG.copy + '<span>Copiar endereço</span>'); copy.type = 'button';
+        var title = el('h2'); title.id = 'clTitle'; title.textContent = cfg.title;
+        var hl = el('p', 'cl-mail'); hl.textContent = cfg.highlight;
+        var hint = el('p', 'cl-hint'); hint.textContent = cfg.hint;
+        var actions = el('div', 'cl-actions');
+        var links = [];
+        cfg.actions.forEach(function (a) {
+            var n = el('a', 'cl-btn ' + (a.primary ? 'cl-btn--primary' : 'cl-btn--line'), (SVG[a.icon] || '') + '<span></span>');
+            n.querySelector('span').textContent = a.label; n.href = a.href;
+            if (a.blank) { n.target = '_blank'; n.rel = 'noopener'; }
+            if (a.native) n.setAttribute('data-native', '');
+            n.addEventListener('click', function () { setTimeout(close, a.blank ? 150 : 450); });
+            actions.appendChild(n); links.push(n);
+        });
+        var copy = el('button', 'cl-btn cl-btn--line', SVG.copy + '<span></span>'); copy.type = 'button'; copy.querySelector('span').textContent = cfg.copy.label;
+        actions.appendChild(copy);
         var x = el('button', 'cl-x', SVG.x); x.type = 'button'; x.setAttribute('aria-label', 'Fechar');
-        var ico = el('div', 'cl-ico', SVG.mail);
-        var actions = el('div', 'cl-actions'); actions.appendChild(gmail); actions.appendChild(app); actions.appendChild(copy);
-        [x, ico, title, mail, hint, actions].forEach(function (n) { card.appendChild(n); });
+        var ico = el('div', 'cl-ico', SVG[cfg.icon]);
+        [x, ico, title, hl, hint, actions].forEach(function (n) { card.appendChild(n); });
         back.appendChild(card); document.body.appendChild(back);
         var lock = document.body.style.overflow; document.body.style.overflow = 'hidden';
 
@@ -90,27 +99,64 @@
         document.addEventListener('keydown', onKey, true);
         back.addEventListener('mousedown', function (e) { if (e.target === back) close(); });
         x.addEventListener('click', close);
-        gmail.addEventListener('click', function () { setTimeout(close, 150); });
-        app.addEventListener('click', function () { setTimeout(close, 400); });
         copy.addEventListener('click', function () {
-            copyText(addr).then(function () {
-                copy.classList.add('is-done'); copy.innerHTML = SVG.check + '<span>Endereço copiado</span>';
+            copyText(cfg.copy.text).then(function () {
+                copy.classList.add('is-done'); copy.innerHTML = SVG.check + '<span>' + cfg.copy.done + '</span>';
                 setTimeout(close, 1100);
-            }).catch(function () { copy.querySelector('span').textContent = 'Copie manualmente: ' + addr; });
+            }).catch(function () { copy.querySelector('span').textContent = 'Copie manualmente: ' + cfg.copy.text; });
         });
-        gmail.focus();
+        if (links[0]) links[0].focus();
+    }
+
+    function openMail(addr, subject) {
+        openDialog({
+            icon: 'mail', title: 'Enviar e-mail', highlight: addr, hint: 'Escolha como prefere escrever para o ITEP.',
+            copy: { text: addr, label: 'Copiar endereço', done: 'Endereço copiado' },
+            actions: [
+                { label: 'Abrir no Gmail', icon: 'ext', blank: true, primary: true, href: 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(addr) + (subject ? '&su=' + encodeURIComponent(subject) : '') },
+                { label: 'Usar o aplicativo de e-mail', icon: 'mail', native: true, href: 'mailto:' + addr + (subject ? '?subject=' + encodeURIComponent(subject) : '') }
+            ]
+        });
+    }
+
+    function openPhone(shown, digits) {
+        var d = String(digits).replace(/\D/g, '');
+        if (d.length <= 11) d = '55' + d;
+        openDialog({
+            icon: 'phone', title: 'Falar com o ITEP', highlight: shown, hint: 'Escolha como prefere falar com a equipe.',
+            copy: { text: shown, label: 'Copiar número', done: 'Número copiado' },
+            actions: [
+                { label: 'Chamar no WhatsApp', icon: 'chat', blank: true, primary: true, href: 'https://wa.me/' + d },
+                { label: 'Ligar', icon: 'phone', native: true, href: 'tel:+' + d }
+            ]
+        });
+    }
+
+    /* o link mostra só um número de telefone (sem outro texto)? */
+    var PHONE = /\(\d{2}\)\s*9?\s?\d{4}-\d{4}/;
+    function phoneOf(a) {
+        var t = (a.textContent || '').replace(/\s+/g, ' ').trim();
+        var m = PHONE.exec(t); if (!m) return null;
+        var rest = t.replace(m[0], '').replace(/whatsapp/i, '').replace(/telefone|ligue|ligar/gi, '').trim();
+        return rest.length <= 4 ? m[0] : null;
     }
 
     document.addEventListener('click', function (e) {
         if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-        var a = e.target.closest && e.target.closest('a[href^="mailto:"]');
-        if (!a || a.hasAttribute('data-native')) return;
-        var raw = a.getAttribute('href').slice(7).split('?')[0];
-        var addr; try { addr = decodeURIComponent(raw); } catch (err) { addr = raw; }
-        if (!addr) return;
-        e.preventDefault();
-        openMail(addr);
+        if (!e.target.closest) return;
+        var a = e.target.closest('a[href^="mailto:"]');
+        if (a && !a.hasAttribute('data-native')) {
+            var raw = a.getAttribute('href').slice(7).split('?')[0];
+            var addr; try { addr = decodeURIComponent(raw); } catch (err) { addr = raw; }
+            if (addr) { e.preventDefault(); openMail(addr); }
+            return;
+        }
+        var w = e.target.closest('a[href*="wa.me/"]');
+        if (w && !w.hasAttribute('data-native')) {
+            var shown = phoneOf(w);
+            if (shown) { e.preventDefault(); openPhone(shown, (/wa\.me\/(\d+)/.exec(w.getAttribute('href')) || [])[1] || shown); }
+        }
     });
 
-    window.ITEPContact = { openMail: openMail };
+    window.ITEPContact = { openMail: openMail, openPhone: openPhone };
 })();

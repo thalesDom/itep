@@ -946,3 +946,6 @@ a[href^="mailto:"], .topbar__mail { overflow-wrap: anywhere; }
 
 /* e-mail nunca corta no meio da palavra: só quebra de linha depois do @ */
 a[href^="mailto:"], .topbar__mail, .footer__col a[href^="mailto:"] { overflow-wrap: normal; word-break: normal; }
+.cta__phone a { color: inherit; text-decoration: none; border-radius: 6px; }
+.cta__phone a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.cta__phone a:focus-visible { outline: 3px solid var(--amarelo); outline-offset: 4px; }
