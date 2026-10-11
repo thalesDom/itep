@@ -287,6 +287,22 @@
         });
     })();
 
+    /* cursos no celular: mostra 6 e abre o resto com um botão */
+    (function () {
+        var grid = document.getElementById('courseGrid'); if (!grid) return;
+        var btn = document.createElement('button'); btn.type = 'button'; btn.className = 'courses-more';
+        var total = grid.querySelectorAll('.card').length;
+        btn.textContent = 'Ver todos os ' + total + ' cursos';
+        grid.parentNode.insertBefore(btn, grid.nextSibling);
+        grid.classList.add('is-collapsed');
+        btn.addEventListener('click', function () { grid.classList.remove('is-collapsed'); btn.hidden = true; });
+        document.querySelectorAll('.filter').forEach(function (f) { f.addEventListener('click', function () {
+            var todos = f.dataset.filter === 'todos';
+            grid.classList.toggle('is-collapsed', todos && !btn.hidden); btn.hidden = !todos ? true : btn.hidden;
+            if (!todos) grid.classList.remove('is-collapsed');
+        }); });
+    })();
+
     /* carrossel de cursos no celular: barra de progresso e dica de deslizar */
     (function () {
         var grid = document.getElementById('courseGrid'); if (!grid) return;
